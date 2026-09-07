@@ -1,4 +1,4 @@
-FROM openjdk:21-slim
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY . .
 RUN javac -cp ".:mysql-connector-j-26.7.0.jar" src/controlefinanceiroweb/*.java
