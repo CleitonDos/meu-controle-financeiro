@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Meu Controle Financeiro</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: #0b0b12;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: radial-gradient(circle at 20% 30%, rgba(79, 172, 254, 0.04) 0%, transparent 60%),
+                              radial-gradient(circle at 80% 70%, rgba(220, 50, 50, 0.04) 0%, transparent 60%);
+        }
+
+        .container-fluid {
+            background: #141425 !important;
+            border-radius: 20px !important;
+            border: 1px solid #2a2a4a !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(79, 172, 254, 0.03) !important;
+            padding: 28px 30px !important;
+            max-width: 1350px;
+            margin: 0 auto;
+        }
+
+        .topo-barra {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .titulo-controle {
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 700;
+            padding-left: 16px;
+            border-left: 6px solid transparent;
+            border-image: linear-gradient(180deg, #4facfe, #dc3545) 1;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 0;
+        }
+        .titulo-controle i {
+            background: linear-gradient(135deg, #4facfe, #dc3545);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 30px;
+        }
+        .titulo-controle span {
+            background: linear-gradient(135deg, #4facfe, #dc3545);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-novo {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: #0b0b12;
+            border: none;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 10px 20px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-novo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.4);
+            color: #000;
+        }
+
+        .card-total {
+            background: #1c1c34;
+            border: 1px solid #2a2a4a;
+            border-radius: 14px;
+            padding: 14px 16px;
+            text-align: center;
+            transition: 0.3s;
+            height: 100%;
+        }
+        .card-total:hover {
+            border-color: #4facfe;
+            box-shadow: 0 0 25px rgba(79, 172, 254, 0.06);
+            transform: translateY(-2px);
+        }
+        .card-total .rotulo {
+            color: #8a8ab0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .card-total .valor {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .card-total .valor.entrada { color: #4ade80; }
+        .card-total .valor.saida { color: #dc3545; }
+        .card-total .valor.saldo { color: #4facfe; }
+        .card-total .icone { font-size: 20px; margin-bottom: 4px; display: block; }
+        .card-total .icone.entrada { color: #4ade80; }
+        .card-total .icone.saida { color: #dc3545; }
+        .card-total .icone.saldo { color: #4facfe; }
+
+        .filtros-area {
+            background: #1c1c34;
+            border-radius: 14px;
+            padding: 16px 20px;
+            border: 1px solid #2a2a4a;
+        }
+        .filtros-area .form-label, .modal .form-label {
+            color: #8a8ab0;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .filtros-area .form-select, .modal .form-control, .modal .form-select {
+            background: #0b0b15;
+            border: 1px solid #2d2d50;
+            color: #e0e0f0;
+            font-size: 14px;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+        .filtros-area .form-select:focus, .modal .form-control:focus, .modal .form-select:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.08);
+            background: #0b0b15;
+            color: #e0e0f0;
+        }
+        .filtros-area .form-select option, .modal .form-select option {
+            background: #141425;
+            color: #e0e0f0;
+        }
+
+        .table-responsive {
+            border-radius: 14px;
+            border: 1px solid #2a2a4a;
+            overflow: hidden;
+            margin-top: 16px;
+            background: transparent;
+        }
+
+        .table {
+            margin-bottom: 0;
+            font-size: 14px;
+            background: transparent;
+        }
+
+        .table thead th {
+            background: #1c1c34;
+            color: #4facfe;
+            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+            border-bottom: 2px solid #2f2f52;
+            border-color: #2a2a4a;
+        }
+
+        .table tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-color: #1e1e36;
+            color: #d4d4f0;
+            background: transparent !important;
+        }
+
+        .table tbody tr {
+            background: transparent !important;
+            transition: 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(79, 172, 254, 0.03) !important;
+        }
+
+        .table tbody tr.linha-entrada td { color: #4ade80 !important; }
+        .table tbody tr.linha-saida td { color: #dc3545 !important; }
+
+        .badge-tipo {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            background: transparent !important;
+            border: 1px solid;
+        }
+        .badge-tipo.entrada {
+            color: #4ade80;
+            border-color: rgba(74, 222, 128, 0.3);
+        }
+        .badge-tipo.saida {
+            color: #dc3545;
+            border-color: rgba(220, 53, 69, 0.3);
+        }
+
+        .obs-icon {
+            color: #5a5a7a;
+            font-size: 14px;
+            cursor: help;
+        }
+        .obs-icon:hover { color: #8a8ab0; }
+
+        /* Botões de Ação na Tabela */
+        .btn-acao {
+            background: transparent;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .btn-acao-edit { color: #4facfe; }
+        .btn-acao-edit:hover { background: rgba(79, 172, 254, 0.15); }
+        .btn-acao-del { color: #dc3545; }
+        .btn-acao-del:hover { background: rgba(220, 53, 69, 0.15); }
+
+        .rodape-info { color: #6a6a8a; font-size: 13px; }
+        .rodape-info i { color: #4facfe; }
+
+        .modal-content {
+            background: #141425;
+            border: 1px solid #2a2a4a;
+            border-radius: 16px;
+            color: #ffffff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+        .modal-header { border-bottom: 1px solid #2a2a4a; }
+        .modal-footer { border-top: 1px solid #2a2a4a; }
+        .btn-close-white { filter: invert(1); }
+
+        @media (max-width: 768px) {
+            .container-fluid { padding: 16px !important; }
+            .titulo-controle { font-size: 20px; }
+            .card-total .valor { font-size: 18px; }
+            .table { font-size: 13px; }
+            .table thead th, .table tbody td { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid">
+
+        <!-- TOPO -->
+        <div class="topo-barra">
+            <div class="titulo-controle">
+                <i class="fas fa-wallet"></i>
+                <span>Meu Controle Financeiro</span>
+            </div>
+            <button class="btn btn-novo" data-bs-toggle="modal" data-bs-target="#modalNovoLancamento">
+                <i class="fas fa-plus"></i> Novo Lançamento
+            </button>
+        </div>
+
+        <div class="row g-3 align-items-stretch mb-4">
+
+            <!-- TOTAIS DINÂMICOS -->
+            <div class="col-12 col-lg-4">
+                <div class="row g-2">
+                    <div class="col-4">
+                        <div class="card-total">
+                            <span class="icone entrada"><i class="fas fa-arrow-down"></i></span>
+                            <span class="rotulo">Entrada</span>
+                            <div class="valor entrada" id="displayEntrada">R$ 0,00</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card-total">
+                            <span class="icone saida"><i class="fas fa-arrow-up"></i></span>
+                            <span class="rotulo">Saída</span>
+                            <div class="valor saida" id="displaySaida">R$ 0,00</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card-total">
+                            <span class="icone saldo"><i class="fas fa-scale-balanced"></i></span>
+                            <span class="rotulo">Saldo Atual</span>
+                            <div class="valor saldo" id="displaySaldo">R$ 0,00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="col-12 col-lg-8">
+                <div class="filtros-area">
+                    <div class="row g-2">
+                        <div class="col-6 col-md-3">
+                            <label class="form-label"><i class="fas fa-university me-1"></i> Banco</label>
+                            <select id="filtroBanco" class="form-select form-select-sm" onchange="aplicarFiltros()">
+                                <option value="">Todos</option>
+                                <option value="Caixa">Caixa</option>
+                                <option value="Nubank">Nubank</option>
+                                <option value="Banco do Brasil">Banco do Brasil</option>
+                            </select>
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <label class="form-label"><i class="fas fa-tag me-1"></i> Tipo</label>
+                            <select id="filtroTipo" class="form-select form-select-sm" onchange="aplicarFiltros()">
+                                <option value="">Todos</option>
+                                <option value="Entrada">Entrada</option>
+                                <option value="Saída">Saída</option>
+                            </select>
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <label class="form-label"><i class="fas fa-calendar me-1"></i> Ano</label>
+                            <select id="filtroAno" class="form-select form-select-sm" onchange="aplicarFiltros()">
+                                <option value="">Todos</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <label class="form-label"><i class="fas fa-calendar-alt me-1"></i> Mês</label>
+                            <select id="filtroMes" class="form-select form-select-sm" onchange="aplicarFiltros()">
+                                <option value="">Todos</option>
+                                <option value="01">Janeiro</option>
+                                <option value="02">Fevereiro</option>
+                                <option value="03">Março</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Maio</option>
+                                <option value="06">Junho</option>
+                                <option value="07">Julho</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TABELA -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-calendar-day me-1"></i> Data</th>
+                        <th><i class="fas fa-university me-1"></i> Banco</th>
+                        <th><i class="fas fa-tag me-1"></i> Tipo</th>
+                        <th><i class="fas fa-align-left me-1"></i> Descrição</th>
+                        <th class="text-end"><i class="fas fa-dollar-sign me-1"></i> Valor</th>
+                        <th class="text-end"><i class="fas fa-wallet me-1"></i> Saldo</th>
+                        <th><i class="fas fa-pen me-1"></i> Observação</th>
+                        <th class="text-center" style="width: 90px;"><i class="fas fa-gear me-1"></i> Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela">
+                    <!--DADOS_TABELA-->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- RODAPÉ -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="rodape-info d-flex justify-content-end align-items-center gap-3 flex-wrap">
+                    <span><i class="fas fa-database me-1"></i> <span id="qtdRegistros">0</span> registros</span>
+                    <span><i class="fas fa-rotate me-1"></i> Conectado ao MySQL</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL NOVO -->
+    <div class="modal fade" id="modalNovoLancamento" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="/salvar" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-plus-circle me-2 text-info"></i>Novo Lançamento</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label">Data</label>
+                                <input type="date" name="data" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Banco</label>
+                                <select name="banco" class="form-select" required>
+                                    <option value="Caixa">Caixa</option>
+                                    <option value="Nubank">Nubank</option>
+                                    <option value="Banco do Brasil">Banco do Brasil</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Tipo</label>
+                                <select name="tipo" class="form-select" required>
+                                    <option value="Entrada">Entrada</option>
+                                    <option value="Saída">Saída</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Valor (R$)</label>
+                                <input type="number" step="0.01" name="valor" class="form-control" placeholder="0.00" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Descrição</label>
+                                <input type="text" name="descricao" class="form-control" placeholder="Ex: Pagamento Internet" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Observação</label>
+                                <input type="text" name="observacao" class="form-control" placeholder="Ex: Pago com desconto">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-novo">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div class="modal fade" id="modalEditarLancamento" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="/editar" method="POST">
+                    <input type="hidden" name="id" id="editId">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-pen-to-square me-2 text-warning"></i>Editar Lançamento</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label">Data</label>
+                                <input type="date" name="data" id="editData" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Banco</label>
+                                <select name="banco" id="editBanco" class="form-select" required>
+                                    <option value="Caixa">Caixa</option>
+                                    <option value="Nubank">Nubank</option>
+                                    <option value="Banco do Brasil">Banco do Brasil</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Tipo</label>
+                                <select name="tipo" id="editTipo" class="form-select" required>
+                                    <option value="Entrada">Entrada</option>
+                                    <option value="Saída">Saída</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Valor (R$)</label>
+                                <input type="number" step="0.01" name="valor" id="editValor" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Descrição</label>
+                                <input type="text" name="descricao" id="editDescricao" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Observação</label>
+                                <input type="text" name="observacao" id="editObservacao" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning text-dark fw-bold">Atualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function aplicarFiltros() {
+            const bancoFiltro = document.getElementById("filtroBanco").value.toLowerCase();
+            const tipoFiltro = document.getElementById("filtroTipo").value.toLowerCase();
+            const anoFiltro = document.getElementById("filtroAno").value;
+            const mesFiltro = document.getElementById("filtroMes").value;
+
+            const linhas = document.querySelectorAll("#corpoTabela tr");
+            let totalEntrada = 0.0;
+            let totalSaida = 0.0;
+            let saldoFinal = 0.0;
+            let registrosVisiveis = 0;
+
+            linhas.forEach(linha => {
+                const banco = (linha.getAttribute("data-banco") || "").toLowerCase();
+                const tipo = (linha.getAttribute("data-tipo") || "").toLowerCase();
+                const data = linha.getAttribute("data-data") || "";
+                const valor = parseFloat(linha.getAttribute("data-valor") || "0");
+                const saldo = parseFloat(linha.getAttribute("data-saldo") || "0");
+
+                const partes = data.split("-");
+                const ano = partes[0];
+                const mes = partes[1];
+
+                const matchBanco = !bancoFiltro || banco === bancoFiltro;
+                const matchTipo = !tipoFiltro || tipo === tipoFiltro;
+                const matchAno = !anoFiltro || ano === anoFiltro;
+                const matchMes = !mesFiltro || mes === mesFiltro;
+
+                if (matchBanco && matchTipo && matchAno && matchMes) {
+                    linha.style.display = "";
+                    registrosVisiveis++;
+
+                    if (tipo.includes("entrada")) {
+                        totalEntrada += valor;
+                    } else {
+                        totalSaida += valor;
+                    }
+                    saldoFinal = saldo;
+                } else {
+                    linha.style.display = "none";
+                }
+            });
+
+            document.getElementById("displayEntrada").innerText = "R$ " + totalEntrada.toFixed(2).replace(".", ",");
+            document.getElementById("displaySaida").innerText = "R$ " + totalSaida.toFixed(2).replace(".", ",");
+            document.getElementById("displaySaldo").innerText = "R$ " + saldoFinal.toFixed(2).replace(".", ",");
+            document.getElementById("qtdRegistros").innerText = registrosVisiveis;
+        }
+
+        function abrirModalEditar(id, data, banco, tipo, desc, valor, obs) {
+            document.getElementById("editId").value = id;
+            document.getElementById("editData").value = data;
+            document.getElementById("editBanco").value = banco;
+            document.getElementById("editTipo").value = tipo;
+            document.getElementById("editValor").value = valor;
+            document.getElementById("editDescricao").value = desc;
+            document.getElementById("editObservacao").value = obs;
+
+            const modal = new bootstrap.Modal(document.getElementById('modalEditarLancamento'));
+            modal.show();
+        }
+
+        window.onload = aplicarFiltros;
+    </script>
+</body>
+</html>
