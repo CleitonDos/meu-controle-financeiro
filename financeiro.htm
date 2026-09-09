@@ -731,7 +731,7 @@
             localStorage.setItem("filtro_mes", document.getElementById("filtroMes").value);
         }
 
-        function aplicarFiltros() {
+       function aplicarFiltros() {
             salvarFiltrosNaMemoria();
 
             const bancoFiltro = document.getElementById("filtroBanco").value.toLowerCase();
@@ -742,7 +742,6 @@
             const linhas = document.querySelectorAll("#corpoTabela tr");
             let totalEntrada = 0.0;
             let totalSaida = 0.0;
-            let saldoFinal = 0.0;
             let registrosVisiveis = 0;
 
             linhas.forEach(linha => {
@@ -750,7 +749,6 @@
                 const tipo = (linha.getAttribute("data-tipo") || "").toLowerCase();
                 const data = linha.getAttribute("data-data") || "";
                 const valor = parseFloat(linha.getAttribute("data-valor") || "0");
-                const saldo = parseFloat(linha.getAttribute("data-saldo") || "0");
 
                 const partes = data.split("-");
                 const ano = partes[0];
@@ -767,21 +765,22 @@
 
                     if (tipo.includes("entrada")) {
                         totalEntrada += valor;
-                    } else {
+                    } else if (tipo.includes("saída") || tipo.includes("saida")) {
                         totalSaida += valor;
                     }
-                    saldoFinal = saldo;
                 } else {
                     linha.style.display = "none";
                 }
             });
+
+            // Calcula o saldo exato apenas dos lançamentos filtrados do banco selecionado
+            const saldoFinal = totalEntrada - totalSaida;
 
             document.getElementById("displayEntrada").innerText = "R$ " + totalEntrada.toFixed(2).replace(".", ",");
             document.getElementById("displaySaida").innerText = "R$ " + totalSaida.toFixed(2).replace(".", ",");
             document.getElementById("displaySaldo").innerText = "R$ " + saldoFinal.toFixed(2).replace(".", ",");
             document.getElementById("qtdRegistros").innerText = registrosVisiveis;
         }
-
         function abrirModalEditar(id, data, banco, tipo, desc, valor, obs) {
             document.getElementById("editId").value = id;
             document.getElementById("editData").value = data;
