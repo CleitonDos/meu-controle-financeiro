@@ -21,7 +21,7 @@
                               radial-gradient(circle at 80% 70%, rgba(220, 50, 50, 0.04) 0%, transparent 60%);
         }
 
-        /* TELA DE BLOQUEIO / SENHA */
+        /* TELA DE BLOQUEIO / SENHA / BIOMETRIA */
         #telaBloqueio {
             position: fixed;
             top: 0;
@@ -63,6 +63,26 @@
             border-color: #4facfe;
             color: #ffffff;
             box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.15);
+        }
+
+        .btn-digital {
+            background: rgba(79, 172, 254, 0.1);
+            color: #4facfe;
+            border: 1px solid #4facfe;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 10px 16px;
+            width: 100%;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn-digital:hover {
+            background: #4facfe;
+            color: #0b0b12;
         }
 
         .container-fluid {
@@ -307,16 +327,26 @@
     <!-- TELA DE LOGIN / BLOQUEIO -->
     <div id="telaBloqueio">
         <div class="card-login">
-            <i class="fas fa-lock text-info mb-3" style="font-size: 44px;"></i>
-            <h4 class="text-white mb-2 fw-bold">Acesso Restrito</h4>
-            <p class="text-secondary small mb-4">Digite sua senha para acessar seu controle financeiro</p>
+            <i class="fas fa-fingerprint text-info mb-3" style="font-size: 46px;"></i>
+            <h4 class="text-white mb-2 fw-bold">Acesso Seguro</h4>
+            <p class="text-secondary small mb-4">Desbloqueie usando sua digital ou senha numérica</p>
+            
+            <!-- Botão de Digital (aparece se cadastrada ou suportada) -->
+            <button type="button" id="btnAutenticarDigital" class="btn-digital mb-3" onclick="entrarComDigital()" style="display: none;">
+                <i class="fas fa-fingerprint fa-lg"></i> Entrar com a Digital
+            </button>
+
             <form onsubmit="validarAcesso(event)">
                 <input type="password" id="inputSenhaApp" class="form-control mb-3" placeholder="••••" required autofocus>
-                <button type="submit" class="btn btn-novo w-100 justify-content-center">Entrar no Sistema</button>
+                <button type="submit" class="btn btn-novo w-100 justify-content-center">Entrar com Senha</button>
                 <div id="erroSenha" class="text-danger small mt-3 fw-bold d-none">
                     <i class="fas fa-circle-exclamation me-1"></i> Senha incorreta! Tente novamente.
                 </div>
             </form>
+
+            <button type="button" id="btnCadastrarDigital" class="btn btn-sm btn-link text-secondary text-decoration-none mt-3" onclick="cadastrarDigital()" style="display: none; font-size: 12px;">
+                <i class="fas fa-key me-1"></i> Ativar login por digital neste aparelho
+            </button>
         </div>
     </div>
 
@@ -335,7 +365,7 @@
 
         <div class="row g-3 align-items-stretch mb-4">
 
-            <!-- TOTAIS DINÂMICOS (AMPLIADOS: col-lg-7) -->
+            <!-- TOTAIS DINÂMICOS (col-lg-7) -->
             <div class="col-12 col-lg-7">
                 <div class="row g-2 h-100">
                     <div class="col-4">
@@ -362,7 +392,7 @@
                 </div>
             </div>
 
-            <!-- FILTROS (COMPACTADOS: col-lg-5) -->
+            <!-- FILTROS (col-lg-5) -->
             <div class="col-12 col-lg-5">
                 <div class="filtros-area h-100 p-2 px-3 d-flex align-items-center">
                     <div class="row g-2 w-100">
@@ -560,7 +590,7 @@
 
     <script>
         // ==========================================
-        // CONFIGURAÇÃO DA SENHA DO APLICATIVO
+        // CONFIGURAÇÃO DE SEGURANÇA E DIGITAL
         // ==========================================
         const SENHA_SECRETA = "4790";
 
@@ -569,7 +599,23 @@
             if (autenticado === "sim") {
                 const tela = document.getElementById("telaBloqueio");
                 if (tela) tela.style.display = "none";
+                return;
             }
+
+            // Verifica suporte a biometria no dispositivo
+            if (window.PublicKeyCredential) {
+                const credId = localStorage.getItem("biometria_cred_id");
+                if (credId) {
+                    document.getElementById("btnAutenticarDigital").style.display = "flex";
+                } else {
+                    document.getElementById("btnCadastrarDigital").style.display = "inline-block";
+                }
+            }
+        }
+
+        function liberarAcesso() {
+            sessionStorage.setItem("app_liberado", "sim");
+            document.getElementById("telaBloqueio").style.display = "none";
         }
 
         function validarAcesso(event) {
@@ -578,13 +624,88 @@
             const msgErro = document.getElementById("erroSenha");
 
             if (digitada === SENHA_SECRETA) {
-                sessionStorage.setItem("app_liberado", "sim");
-                document.getElementById("telaBloqueio").style.display = "none";
+                liberarAcesso();
                 msgErro.classList.add("d-none");
             } else {
                 msgErro.classList.remove("d-none");
                 document.getElementById("inputSenhaApp").value = "";
                 document.getElementById("inputSenhaApp").focus();
+            }
+        }
+
+        // Ativa a leitura biométrica (WebAuthn)
+        async function cadastrarDigital() {
+            const senha = prompt("Digite a sua senha numérica para autorizar a digital:");
+            if (senha !== SENHA_SECRETA) {
+                alert("Senha incorreta!");
+                return;
+            }
+
+            try {
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                const userId = new Uint8Array(16);
+                window.crypto.getRandomValues(userId);
+
+                const credential = await navigator.credentials.create({
+                    publicKey: {
+                        challenge: challenge,
+                        rp: { name: "Controle Financeiro" },
+                        user: {
+                            id: userId,
+                            name: "usuario",
+                            displayName: "Usuario"
+                        },
+                        pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
+                        authenticatorSelection: {
+                            authenticatorAttachment: "platform",
+                            userVerification: "required"
+                        },
+                        timeout: 60000
+                    }
+                });
+
+                if (credential) {
+                    const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+                    localStorage.setItem("biometria_cred_id", rawId);
+                    alert("Digital cadastrada com sucesso!");
+                    document.getElementById("btnCadastrarDigital").style.display = "none";
+                    document.getElementById("btnAutenticarDigital").style.display = "flex";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Não foi possível cadastrar a digital ou operação cancelada.");
+            }
+        }
+
+        // Entra encostando a digital
+        async function entrarComDigital() {
+            const credIdBase64 = localStorage.getItem("biometria_cred_id");
+            if (!credIdBase64) return;
+
+            try {
+                const rawId = Uint8Array.from(atob(credIdBase64), c => c.charCodeAt(0));
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+
+                const assertion = await navigator.credentials.get({
+                    publicKey: {
+                        challenge: challenge,
+                        allowCredentials: [{
+                            id: rawId,
+                            type: "public-key"
+                        }],
+                        userVerification: "required",
+                        timeout: 60000
+                    }
+                });
+
+                if (assertion) {
+                    liberarAcesso();
+                }
+            } catch (err) {
+                console.error(err);
+                // Se o usuário cancelar ou a digital falhar, ele usa a senha numérica
             }
         }
 
