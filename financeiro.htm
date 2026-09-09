@@ -109,6 +109,7 @@
             font-size: 22px;
             font-weight: 700;
             margin-top: 2px;
+            white-space: nowrap;
         }
         .card-total .valor.entrada { color: #4ade80; }
         .card-total .valor.saida { color: #dc3545; }
@@ -121,7 +122,6 @@
         .filtros-area {
             background: #1c1c34;
             border-radius: 14px;
-            padding: 16px 20px;
             border: 1px solid #2a2a4a;
         }
         .filtros-area .form-label, .modal .form-label {
@@ -136,9 +136,9 @@
             background: #0b0b15;
             border: 1px solid #2d2d50;
             color: #e0e0f0;
-            font-size: 14px;
+            font-size: 13px;
             border-radius: 8px;
-            padding: 8px 12px;
+            padding: 6px 10px;
         }
         .filtros-area .form-select:focus, .modal .form-control:focus, .modal .form-select:focus {
             border-color: #4facfe;
@@ -276,9 +276,9 @@
 
         <div class="row g-3 align-items-stretch mb-4">
 
-            <!-- TOTAIS DINÂMICOS -->
-            <div class="col-12 col-lg-4">
-                <div class="row g-2">
+            <!-- TOTAIS DINÂMICOS (AMPLIADOS: col-lg-7) -->
+            <div class="col-12 col-lg-7">
+                <div class="row g-2 h-100">
                     <div class="col-4">
                         <div class="card-total">
                             <span class="icone entrada"><i class="fas fa-arrow-down"></i></span>
@@ -303,12 +303,12 @@
                 </div>
             </div>
 
-            <!-- FILTROS -->
-            <div class="col-12 col-lg-8">
-                <div class="filtros-area">
-                    <div class="row g-2">
+            <!-- FILTROS (COMPACTADOS: col-lg-5) -->
+            <div class="col-12 col-lg-5">
+                <div class="filtros-area h-100 p-2 px-3 d-flex align-items-center">
+                    <div class="row g-2 w-100">
                         <div class="col-6 col-md-3">
-                            <label class="form-label"><i class="fas fa-university me-1"></i> Banco</label>
+                            <label class="form-label mb-1"><i class="fas fa-university me-1"></i> Banco</label>
                             <select id="filtroBanco" class="form-select form-select-sm" onchange="aplicarFiltros()">
                                 <option value="">Todos</option>
                                 <option value="Caixa">Caixa</option>
@@ -318,7 +318,7 @@
                         </div>
 
                         <div class="col-6 col-md-3">
-                            <label class="form-label"><i class="fas fa-tag me-1"></i> Tipo</label>
+                            <label class="form-label mb-1"><i class="fas fa-tag me-1"></i> Tipo</label>
                             <select id="filtroTipo" class="form-select form-select-sm" onchange="aplicarFiltros()">
                                 <option value="">Todos</option>
                                 <option value="Entrada">Entrada</option>
@@ -327,7 +327,7 @@
                         </div>
 
                         <div class="col-6 col-md-3">
-                            <label class="form-label"><i class="fas fa-calendar me-1"></i> Ano</label>
+                            <label class="form-label mb-1"><i class="fas fa-calendar me-1"></i> Ano</label>
                             <select id="filtroAno" class="form-select form-select-sm" onchange="aplicarFiltros()">
                                 <option value="">Todos</option>
                                 <option value="2025">2025</option>
@@ -336,21 +336,21 @@
                         </div>
 
                         <div class="col-6 col-md-3">
-                            <label class="form-label"><i class="fas fa-calendar-alt me-1"></i> Mês</label>
+                            <label class="form-label mb-1"><i class="fas fa-calendar-alt me-1"></i> Mês</label>
                             <select id="filtroMes" class="form-select form-select-sm" onchange="aplicarFiltros()">
                                 <option value="">Todos</option>
-                                <option value="01">Janeiro</option>
-                                <option value="02">Fevereiro</option>
-                                <option value="03">Março</option>
-                                <option value="04">Abril</option>
-                                <option value="05">Maio</option>
-                                <option value="06">Junho</option>
-                                <option value="07">Julho</option>
-                                <option value="08">Agosto</option>
-                                <option value="09">Setembro</option>
-                                <option value="10">Outubro</option>
-                                <option value="11">Novembro</option>
-                                <option value="12">Dezembro</option>
+                                <option value="01">Jan</option>
+                                <option value="02">Fev</option>
+                                <option value="03">Mar</option>
+                                <option value="04">Abr</option>
+                                <option value="05">Mai</option>
+                                <option value="06">Jun</option>
+                                <option value="07">Jul</option>
+                                <option value="08">Ago</option>
+                                <option value="09">Set</option>
+                                <option value="10">Out</option>
+                                <option value="11">Nov</option>
+                                <option value="12">Dez</option>
                             </select>
                         </div>
                     </div>
