@@ -25,9 +25,9 @@ public class Conexao {
             throw new SQLException("Driver MySQL não encontrado: " + e.getMessage());
         }
     }
-   public static void inicializarBanco() {
-        String dropSql = "DROP TABLE IF EXISTS lancamentos;";
-        String createSql = "CREATE TABLE lancamentos ("
+  public static void inicializarBanco() {
+        // Agora usa APENAS 'IF NOT EXISTS'. Se a tabela já existir, ele mantém intacta com todos os seus dados!
+        String createSql = "CREATE TABLE IF NOT EXISTS lancamentos ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, "
                 + "descricao VARCHAR(255) NOT NULL, "
                 + "valor DOUBLE NOT NULL, "
@@ -40,11 +40,10 @@ public class Conexao {
                 + ");";
 
         try (Connection conn = conectar(); Statement stmt = conn.createStatement()) {
-            stmt.execute(dropSql);
             stmt.execute(createSql);
-            System.out.println("Tabela de lancamentos 100% alinhada com o DAO!");
+            System.out.println("Tabela verificada com sucesso! Dados protegidos contra exclusao.");
         } catch (SQLException e) {
-            System.err.println("Erro ao inicializar tabela no TiDB: " + e.getMessage());
+            System.err.println("Erro ao verificar tabela no TiDB: " + e.getMessage());
         }
     }
     
