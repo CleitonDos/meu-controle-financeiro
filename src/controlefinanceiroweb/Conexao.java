@@ -25,8 +25,7 @@ public class Conexao {
             throw new SQLException("Driver MySQL não encontrado: " + e.getMessage());
         }
     }
-    public static void inicializarBanco() {
-        // Apaga a tabela antiga para aplicar todas as colunas definitivas
+   public static void inicializarBanco() {
         String dropSql = "DROP TABLE IF EXISTS lancamentos;";
         String createSql = "CREATE TABLE lancamentos ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, "
@@ -35,6 +34,7 @@ public class Conexao {
                 + "tipo VARCHAR(20) NOT NULL, "
                 + "categoria VARCHAR(50) NULL, "
                 + "banco VARCHAR(50) NULL, "
+                + "saldo DOUBLE NULL, "
                 + "observacao TEXT NULL, "
                 + "data_movimentacao DATE NOT NULL"
                 + ");";
@@ -42,7 +42,7 @@ public class Conexao {
         try (Connection conn = conectar(); Statement stmt = conn.createStatement()) {
             stmt.execute(dropSql);
             stmt.execute(createSql);
-            System.out.println("Tabela de lancamentos 100% pronta com observacao!");
+            System.out.println("Tabela de lancamentos 100% alinhada com o DAO!");
         } catch (SQLException e) {
             System.err.println("Erro ao inicializar tabela no TiDB: " + e.getMessage());
         }
