@@ -13,7 +13,7 @@ public class Conexao {
     private static final String USUARIO = "3ujUqDVrbjXcqg9.root";
     
     // COLE SUA SENHA DO TIDB AQUI ENTRE AS ASPAS:
-    private static final String SENHA = "SUA_SENHA_AQUI";
+    private static final String SENHA = "pcy84y6oVVitezTC";
 
     private static final String URL = "jdbc:mysql://" + HOST + ":" + PORTA + "/" + BANCO + "?sslMode=VERIFY_IDENTITY";
 
