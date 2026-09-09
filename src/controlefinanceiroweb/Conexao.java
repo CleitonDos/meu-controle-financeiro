@@ -1,4 +1,4 @@
-package controledespesapessoal;
+package controlefinanceiroweb;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,18 +7,17 @@ import java.sql.Statement;
 
 public class Conexao {
 
-    // Configurações extraídas do seu TiDB Cloud
     private static final String HOST = "gateway01.us-east-1.prod.aws.tidbcloud.com";
     private static final String PORTA = "4000";
     private static final String BANCO = "sys";
     private static final String USUARIO = "3ujUqDVrbjXcqg9.root";
     
-    // COLE AQUI ENTRE AS ASPAS A SENHA QUE VOCÊ SALVOU NO BLOCO DE NOTAS:
+    // COLE SUA SENHA DO TIDB AQUI ENTRE AS ASPAS:
     private static final String SENHA = "SUA_SENHA_AQUI";
 
     private static final String URL = "jdbc:mysql://" + HOST + ":" + PORTA + "/" + BANCO + "?sslMode=VERIFY_IDENTITY";
 
-    public static Connection getConexao() throws SQLException {
+    public static Connection conectar() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(URL, USUARIO, SENHA);
@@ -27,22 +26,21 @@ public class Conexao {
         }
     }
 
-    public static void criarTabelaSeNaoExistir() {
-        String sql = "CREATE TABLE IF NOT EXISTS despesas ("
+    public static void inicializarBanco() {
+        String sql = "CREATE TABLE IF NOT EXISTS lancamentos ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, "
                 + "descricao VARCHAR(255) NOT NULL, "
-                + "tipo VARCHAR(50) NOT NULL, "
-                + "categoria VARCHAR(50) NOT NULL, "
                 + "valor DOUBLE NOT NULL, "
-                + "data_vencimento DATE NOT NULL, "
-                + "data_pagamento DATE NULL"
+                + "tipo VARCHAR(20) NOT NULL, "
+                + "categoria VARCHAR(50) NOT NULL, "
+                + "data DATE NOT NULL"
                 + ");";
 
-        try (Connection con = getConexao(); Statement stmt = con.createStatement()) {
+        try (Connection conn = conectar(); Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-            System.out.println("Tabela verificada/criada com sucesso no TiDB!");
+            System.out.println("Tabela inicializada com sucesso no TiDB!");
         } catch (SQLException e) {
-            System.err.println("Erro ao criar tabela no TiDB: " + e.getMessage());
+            System.err.println("Erro ao inicializar tabela no TiDB: " + e.getMessage());
         }
     }
 }
