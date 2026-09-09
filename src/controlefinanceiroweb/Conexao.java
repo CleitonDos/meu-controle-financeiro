@@ -27,20 +27,22 @@ public class Conexao {
     }
 
     public static void inicializarBanco() {
-        String sql = "CREATE TABLE IF NOT EXISTS lancamentos ("
+        // Remove a tabela com a coluna antiga e cria com as colunas certas do seu sistema
+        String dropSql = "DROP TABLE IF EXISTS lancamentos;";
+        String createSql = "CREATE TABLE lancamentos ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, "
                 + "descricao VARCHAR(255) NOT NULL, "
                 + "valor DOUBLE NOT NULL, "
                 + "tipo VARCHAR(20) NOT NULL, "
                 + "categoria VARCHAR(50) NOT NULL, "
-                + "data DATE NOT NULL"
+                + "data_movimentacao DATE NOT NULL"
                 + ");";
 
         try (Connection conn = conectar(); Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
-            System.out.println("Tabela inicializada com sucesso no TiDB!");
+            stmt.execute(dropSql);
+            stmt.execute(createSql);
+            System.out.println("Tabela de lancamentos atualizada e pronta!");
         } catch (SQLException e) {
             System.err.println("Erro ao inicializar tabela no TiDB: " + e.getMessage());
         }
     }
-}
