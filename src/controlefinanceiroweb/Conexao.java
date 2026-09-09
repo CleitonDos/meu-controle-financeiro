@@ -9,7 +9,7 @@ public class Conexao {
 
     private static final String HOST = "gateway01.us-east-1.prod.aws.tidbcloud.com";
     private static final String PORTA = "4000";
-    private static final String BANCO = "sys";
+    private static final String BANCO = "test";
     private static final String USUARIO = "3ujUqDVrbjXcqg9.root";
     
     // COLE SUA SENHA DO TIDB AQUI ENTRE AS ASPAS:
