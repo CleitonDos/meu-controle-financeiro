@@ -499,7 +499,28 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        function carregarFiltrosSalvos() {
+            const banco = localStorage.getItem("filtro_banco");
+            const tipo = localStorage.getItem("filtro_tipo");
+            const ano = localStorage.getItem("filtro_ano");
+            const mes = localStorage.getItem("filtro_mes");
+
+            if (banco !== null) document.getElementById("filtroBanco").value = banco;
+            if (tipo !== null) document.getElementById("filtroTipo").value = tipo;
+            if (ano !== null) document.getElementById("filtroAno").value = ano;
+            if (mes !== null) document.getElementById("filtroMes").value = mes;
+        }
+
+        function salvarFiltrosNaMemoria() {
+            localStorage.setItem("filtro_banco", document.getElementById("filtroBanco").value);
+            localStorage.setItem("filtro_tipo", document.getElementById("filtroTipo").value);
+            localStorage.setItem("filtro_ano", document.getElementById("filtroAno").value);
+            localStorage.setItem("filtro_mes", document.getElementById("filtroMes").value);
+        }
+
         function aplicarFiltros() {
+            salvarFiltrosNaMemoria();
+
             const bancoFiltro = document.getElementById("filtroBanco").value.toLowerCase();
             const tipoFiltro = document.getElementById("filtroTipo").value.toLowerCase();
             const anoFiltro = document.getElementById("filtroAno").value;
@@ -561,7 +582,10 @@
             modal.show();
         }
 
-        window.onload = aplicarFiltros;
+        window.onload = function() {
+            carregarFiltrosSalvos();
+            aplicarFiltros();
+        };
     </script>
 </body>
 </html>
