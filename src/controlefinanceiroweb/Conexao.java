@@ -46,3 +46,4 @@ public class Conexao {
             System.err.println("Erro ao inicializar tabela no TiDB: " + e.getMessage());
         }
     }
+}
