@@ -103,7 +103,7 @@
                             </tr>
                         </thead>
                         <tbody id="corpoTabela">
-                            <!-- Mantenha as suas linhas da tabela aqui, contendo os atributos data-* -->
+                            <!-- Insira as linhas da tabela com os atributos data-banco, data-tipo, data-data e data-valor aqui -->
                         </tbody>
                     </table>
                 </div>
@@ -116,7 +116,7 @@
 
     <script>
         function salvarFiltrosNaMemoria() {
-            // Lógica opcional de persistência
+            // Lógica opcional para persistir filtros
         }
 
         function aplicarFiltros() {
@@ -161,20 +161,21 @@
                 }
             });
 
-            // Calcula o saldo com base nos filtros
+            // Calcula o saldo (Entradas - Saídas) com base nos filtros aplicados
             let saldoAtual = totalEntrada - totalSaida;
 
-            // Atualiza os cartões do topo
+            // Atualiza os elementos visuais dos cartões no topo mantendo o design original
             document.getElementById("displayEntrada").innerText = "R$ " + totalEntrada.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             document.getElementById("displaySaida").innerText = "R$ " + totalSaida.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             
             const elSaldo = document.getElementById("displaySaldo");
             elSaldo.innerText = "R$ " + saldoAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             
+            // Ajusta a cor do saldo com classes padrão
             if (saldoAtual < 0) {
-                elSaldo.className = "text-danger";
+                elSaldo.className = "valor saldo text-danger";
             } else {
-                elSaldo.className = "text-primary";
+                elSaldo.className = "valor saldo text-primary";
             }
 
             // Atualiza a quantidade de registros no rodapé
