@@ -7,15 +7,17 @@ import java.sql.Statement;
 
 public class Conexao {
 
-    private static final String HOST = "gateway01.us-east-1.prod.aws.tidbcloud.com";
-    private static final String PORTA = "4000";
-    private static final String BANCO = "test";
-    private static final String USUARIO = "3ujUqDVrbjXcqg9.root";
+    // Configurações para o banco de dados LOCAL no DBeaver (MySQL)
+    private static final String HOST = "localhost";
+    private static final String PORTA = "3306";
+    private static final String BANCO = "controle_financeiro"; // Nome do banco que criou no DBeaver
+    private static final String USUARIO = "root";             // O seu utilizador do MySQL local
     
-    // COLE SUA SENHA DO TIDB AQUI ENTRE AS ASPAS:
-    private static final String SENHA = "pcy84y6oVVitezTC";
+    // Insira a sua senha do MySQL local entre as aspas abaixo:
+    private static final String SENHA = "sua_senha_aqui";     
 
-    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORTA + "/" + BANCO + "?sslMode=VERIFY_IDENTITY";
+    // URL de conexão local (sem necessidade de SSL)
+    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORTA + "/" + BANCO + "?useSSL=false&serverTimezone=UTC";
 
     public static Connection conectar() throws SQLException {
         try {
@@ -25,8 +27,9 @@ public class Conexao {
             throw new SQLException("Driver MySQL não encontrado: " + e.getMessage());
         }
     }
-  public static void inicializarBanco() {
-        // Agora usa APENAS 'IF NOT EXISTS'. Se a tabela já existir, ele mantém intacta com todos os seus dados!
+
+    public static void inicializarBanco() {
+        // Cria a tabela automaticamente se ela não existir
         String createSql = "CREATE TABLE IF NOT EXISTS lancamentos ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, "
                 + "descricao VARCHAR(255) NOT NULL, "
@@ -41,10 +44,10 @@ public class Conexao {
 
         try (Connection conn = conectar(); Statement stmt = conn.createStatement()) {
             stmt.execute(createSql);
-            System.out.println("Tabela verificada com sucesso! Dados protegidos contra exclusao.");
+            System.out.println("Tabela verificada com sucesso no banco local!");
         } catch (SQLException e) {
-            System.err.println("Erro ao verificar tabela no TiDB: " + e.getMessage());
+            System.err.println("Erro ao verificar tabela no MySQL local: " + e.getMessage());
         }
     }
     
-    }
+}
