@@ -23,8 +23,6 @@ public class ControleFinanceiroWeb {
         Conexao.inicializarBanco();
 
         HttpServer servidor = HttpServer.create(new InetSocketAddress("0.0.0.0", 8080), 0);
-        
-     
 
         // ROTA 1: Página inicial
         servidor.createContext("/", new HttpHandler() {
@@ -34,8 +32,20 @@ public class ControleFinanceiroWeb {
 
                 if (arquivoHtml.exists()) {
                     String conteudo = new String(Files.readAllBytes(arquivoHtml.toPath()), "UTF-8");
+                    
+                    // 1. Gera as linhas da tabela
                     String linhasBanco = LancamentoDAO.gerarLinhasTabelaHTML();
                     conteudo = conteudo.replace("<!--DADOS_TABELA-->", linhasBanco);
+
+                    // 2. Calcula os totais gerais iniciais (sem restrição de banco ou "Todos")
+                    double totalEntradaGeral = LancamentoDAO.calcularTotalEntradaGeral("Todos");
+                    double totalSaidaGeral = LancamentoDAO.calcularTotalSaidaGeral("Todos");
+                    double saldoAtualGeral = totalEntradaGeral - totalSaidaGeral;
+
+                    // 3. Substitui os valores nos placeholders do HTML
+                    conteudo = conteudo.replace("<!--TOTAL_ENTRADA-->", String.format("R$ %.2f", totalEntradaGeral));
+                    conteudo = conteudo.replace("<!--TOTAL_SAIDA-->", String.format("R$ %.2f", totalSaidaGeral));
+                    conteudo = conteudo.replace("<!--TOTAL_SALDO-->", String.format("R$ %.2f", saldoAtualGeral));
 
                     byte[] resposta = conteudo.getBytes("UTF-8");
                     troca.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
@@ -45,7 +55,7 @@ public class ControleFinanceiroWeb {
                     os.write(resposta);
                     os.close();
                 } else {
-                    String erro = "Arquivo F:/financeiro.htm nao encontrado!";
+                    String erro = "Arquivo financeiro.htm nao encontrado!";
                     troca.sendResponseHeaders(404, erro.length());
                     OutputStream os = troca.getResponseBody();
                     os.write(erro.getBytes());
