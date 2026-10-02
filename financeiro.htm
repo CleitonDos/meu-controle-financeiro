@@ -1,90 +1,91 @@
-// ==========================================
-        // MEMORIZAÇÃO E APLICAÇÃO DOS FILTROS
-        // ==========================================
-        function carregarFiltrosSalvos() {
-            const banco = localStorage.getItem("filtro_banco");
-            const tipo = localStorage.getItem("filtro_tipo");
-            const ano = localStorage.getItem("filtro_ano");
-            const mes = localStorage.getItem("filtro_mes");
+<script>
+    // ==========================================
+    // MEMORIZAÇÃO E APLICAÇÃO DOS FILTROS
+    // ==========================================
+    function carregarFiltrosSalvos() {
+        const banco = localStorage.getItem("filtro_banco");
+        const tipo = localStorage.getItem("filtro_tipo");
+        const ano = localStorage.getItem("filtro_ano");
+        const mes = localStorage.getItem("filtro_mes");
 
-            if (banco !== null) document.getElementById("filtroBanco").value = banco;
-            if (tipo !== null) document.getElementById("filtroTipo").value = tipo;
-            if (ano !== null) document.getElementById("filtroAno").value = ano;
-            if (mes !== null) document.getElementById("filtroMes").value = mes;
-        }
+        if (banco !== null) document.getElementById("filtroBanco").value = banco;
+        if (tipo !== null) document.getElementById("filtroTipo").value = tipo;
+        if (ano !== null) document.getElementById("filtroAno").value = ano;
+        if (mes !== null) document.getElementById("filtroMes").value = mes;
+    }
 
-        function salvarFiltrosNaMemoria() {
-            localStorage.setItem("filtro_banco", document.getElementById("filtroBanco").value);
-            localStorage.setItem("filtro_tipo", document.getElementById("filtroTipo").value);
-            localStorage.setItem("filtro_ano", document.getElementById("filtroAno").value);
-            localStorage.setItem("filtro_mes", document.getElementById("filtroMes").value);
-        }
+    function salvarFiltrosNaMemoria() {
+        localStorage.setItem("filtro_banco", document.getElementById("filtroBanco").value);
+        localStorage.setItem("filtro_tipo", document.getElementById("filtroTipo").value);
+        localStorage.setItem("filtro_ano", document.getElementById("filtroAno").value);
+        localStorage.setItem("filtro_mes", document.getElementById("filtroMes").value);
+    }
 
-        function aplicarFiltros() {
-            salvarFiltrosNaMemoria();
+    function aplicarFiltros() {
+        salvarFiltrosNaMemoria();
 
-            const bancoFiltro = document.getElementById("filtroBanco").value.toLowerCase();
-            const tipoFiltro = document.getElementById("filtroTipo").value.toLowerCase();
-            const anoFiltro = document.getElementById("filtroAno").value;
-            const mesFiltro = document.getElementById("filtroMes").value;
+        const bancoFiltro = document.getElementById("filtroBanco").value.toLowerCase();
+        const tipoFiltro = document.getElementById("filtroTipo").value.toLowerCase();
+        const anoFiltro = document.getElementById("filtroAno").value;
+        const mesFiltro = document.getElementById("filtroMes").value;
 
-            const linhas = document.querySelectorAll("#corpoTabela tr");
-            let totalEntrada = 0.0;
-            let totalSaida = 0.0;
-            let registrosVisiveis = 0;
+        const linhas = document.querySelectorAll("#corpoTabela tr");
+        let totalEntrada = 0.0;
+        let totalSaida = 0.0;
+        let registrosVisiveis = 0;
 
-            linhas.forEach(linha => {
-                const colunas = linha.querySelectorAll("td");
-                if (colunas.length < 6) return;
+        linhas.forEach(linha => {
+            const colunas = linha.querySelectorAll("td");
+            if (colunas.length < 6) return;
 
-                const dataTexto = colunas[0].textContent.trim();
-                const bancoTexto = colunas[1].textContent.trim().toLowerCase();
-                const tipoTexto = colunas[2].textContent.trim().toLowerCase();
+            const dataTexto = colunas[0].textContent.trim();
+            const bancoTexto = colunas[1].textContent.trim().toLowerCase();
+            const tipoTexto = colunas[2].textContent.trim().toLowerCase();
 
-                // Extração de ano e mês da data (formato AAAA-MM-DD)
-                const partesData = dataTexto.split("-");
-                const anoData = partesData[0] || "";
-                const mesData = partesData[1] || "";
+            // Extração de ano e mês da data (formato AAAA-MM-DD)
+            const partesData = dataTexto.split("-");
+            const anoData = partesData[0] || "";
+            const mesData = partesData[1] || "";
 
-                // Limpeza e conversão do valor monetário
-                const valorTexto = colunas[4].textContent.replace("R$", "").replace(/\./g, "").replace(",", ".").trim();
-                const valor = parseFloat(valorTexto) || 0;
+            // Limpeza e conversão do valor monetário
+            const valorTexto = colunas[4].textContent.replace("R$", "").replace(/\./g, "").replace(",", ".").trim();
+            const valor = parseFloat(valorTexto) || 0;
 
-                const atendeBanco = !bancoFiltro || bancoTexto.includes(bancoFiltro);
-                const atendeTipo = !tipoFiltro || tipoTexto.includes(tipoFiltro);
-                const atendeAno = !anoFiltro || anoData === anoFiltro;
-                const atendeMes = !mesFiltro || mesData === mesFiltro;
+            const atendeBanco = !bancoFiltro || bancoTexto.includes(bancoFiltro);
+            const atendeTipo = !tipoFiltro || tipoTexto.includes(tipoFiltro);
+            const atendeAno = !anoFiltro || anoData === anoFiltro;
+            const atendeMes = !mesFiltro || mesData === mesFiltro;
 
-                if (atendeBanco && atendeTipo && atendeAno && atendeMes) {
-                    linha.style.display = "";
-                    registrosVisiveis++;
-                    if (tipoTexto.includes("entrada")) {
-                        totalEntrada += valor;
-                    } else if (tipoTexto.includes("saída") || tipoTexto.includes("saida")) {
-                        totalSaida += valor;
-                    }
-                } else {
-                    linha.style.display = "none";
+            if (atendeBanco && atendeTipo && atendeAno && atendeMes) {
+                linha.style.display = "";
+                registrosVisiveis++;
+                if (tipoTexto.includes("entrada")) {
+                    totalEntrada += valor;
+                } else if (tipoTexto.includes("saída") || tipoTexto.includes("saida")) {
+                    totalSaida += valor;
                 }
-            });
-
-            // Atualização dos cartões de totais
-            document.getElementById("displayEntrada").textContent = `R$ ${totalEntrada.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-            document.getElementById("displaySaida").textContent = `R$ ${totalSaida.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-            
-            const saldoAtual = totalEntrada - totalSaida;
-            const elSaldo = document.getElementById("displaySaldo");
-            elSaldo.textContent = `R$ ${saldoAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-
-            document.getElementById("qtdRegistros").textContent = registrosVisiveis;
-        }
-
-        // Chamar o carregamento dos filtros e aplicar ao iniciar a página
-        window.addEventListener("DOMContentLoaded", () => {
-            carregarFiltrosSalvos();
-            aplicarFiltros();
-            verificarAutenticacao();
+            } else {
+                linha.style.display = "none";
+            }
         });
-    </script>
-</body>
-</html>
+
+        // Atualização dos cartões de totais
+        document.getElementById("displayEntrada").textContent = `R$ ${totalEntrada.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        document.getElementById("displaySaida").textContent = `R$ ${totalSaida.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        
+        const saldoAtual = totalEntrada - totalSaida;
+        const elSaldo = document.getElementById("displaySaldo");
+        elSaldo.textContent = `R$ ${saldoAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+
+        document.getElementById("qtdRegistros").textContent = registrosVisiveis;
+    }
+
+    // Chamar o carregamento dos filtros e aplicar ao iniciar a página
+    window.addEventListener("DOMContentLoaded", () => {
+        carregarFiltrosSalvos();
+        aplicarFiltros();
+        if (typeof verificarAutenticacao === 'function') {
+            verificarAutenticacao();
+        }
+    });
+</script>
