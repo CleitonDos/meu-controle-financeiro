@@ -60,7 +60,7 @@ public class LancamentoDAO {
 
                 html.append("  <td>").append(dataExibicao).append("</td>\n");
                 html.append("  <td><i class='fas fa-building-columns me-1'></i> ").append(banco).append("</td>\n");
-                html.append("  <td><span class='").append(badgeTipo).append("'><i class='fas ").append(iconeSeta).append(" me-1'></i> ").append(tipo).append("</span></td>\n");
+                html.append("  <td><span class='").append(badgeTipo).append("' title=''><i class='fas ").append(iconeSeta).append(" me-1'></i> ").append(tipo).append("</span></td>\n");
                 html.append("  <td>").append(desc).append("</td>\n");
                 html.append("  <td class='text-end'>R$ ").append(String.format("%.2f", valor)).append("</td>\n");
                 html.append("  <td class='text-end'>R$ ").append(String.format("%.2f", saldo)).append("</td>\n");
@@ -159,7 +159,6 @@ public class LancamentoDAO {
                 String tipo = rs.getString("tipo");
                 double valor = rs.getDouble("valor");
 
-                // Assegura robustez na verificação do tipo
                 if (tipo != null && (tipo.equalsIgnoreCase("Entrada") || tipo.equalsIgnoreCase("Receita"))) {
                     saldoAcumulado += valor;
                 } else {
@@ -173,5 +172,63 @@ public class LancamentoDAO {
         } catch (SQLException e) {
             System.out.println("Erro ao recalcular saldos: " + e.getMessage());
         }
+    }
+
+    // =========================================================================
+    // NOVOS MÉTODOS: Totais Gerais para os Cartões (Respeitam apenas o Banco)
+    // =========================================================================
+
+    public static double calcularTotalEntradaGeral(String bancoFiltro) {
+        StringBuilder sql = new StringBuilder("SELECT SUM(valor) FROM lancamentos WHERE (tipo = 'Entrada' OR tipo = 'Receita')");
+        
+        boolean filtrarBanco = bancoFiltro != null && !bancoFiltro.equalsIgnoreCase("Todos") && !bancoFiltro.trim().isEmpty();
+        if (filtrarBanco) {
+            sql.append(" AND banco = ?");
+        }
+
+        double total = 0.0;
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            
+            if (filtrarBanco) {
+                stmt.setString(1, bancoFiltro);
+            }
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getDouble(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao calcular total de entradas gerais: " + e.getMessage());
+        }
+        return total;
+    }
+
+    public static double calcularTotalSaidaGeral(String bancoFiltro) {
+        StringBuilder sql = new StringBuilder("SELECT SUM(valor) FROM lancamentos WHERE (tipo = 'Saída' OR tipo = 'Saida')");
+        
+        boolean filtrarBanco = bancoFiltro != null && !bancoFiltro.equalsIgnoreCase("Todos") && !bancoFiltro.trim().isEmpty();
+        if (filtrarBanco) {
+            sql.append(" AND banco = ?");
+        }
+
+        double total = 0.0;
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            
+            if (filtrarBanco) {
+                stmt.setString(1, bancoFiltro);
+            }
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getDouble(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao calcular total de saídas gerais: " + e.getMessage());
+        }
+        return total;
     }
 }
