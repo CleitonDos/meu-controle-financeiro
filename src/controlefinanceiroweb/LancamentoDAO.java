@@ -48,7 +48,6 @@ public class LancamentoDAO {
                     iconeObs = "<span class='obs-icon' title='Sem observação'><i class='fas fa-comment-slash'></i></span>";
                 }
 
-                // Trata aspas na descrição/observação para não quebrar o JavaScript do botão Editar
                 String descJs = desc.replace("'", "\\'");
                 String obsJs = obs.replace("'", "\\'");
 
@@ -67,7 +66,6 @@ public class LancamentoDAO {
                 html.append("  <td class='text-end'>R$ ").append(String.format("%.2f", saldo)).append("</td>\n");
                 html.append("  <td>").append(iconeObs).append("</td>\n");
 
-                // Coluna de Ações: Editar e Excluir
                 html.append("  <td class='text-center'>\n");
                 html.append("    <button class='btn-acao btn-acao-edit' title='Editar' onclick=\"abrirModalEditar(")
                     .append(id).append(", '").append(dataBanco).append("', '").append(banco).append("', '").append(tipo)
@@ -90,7 +88,6 @@ public class LancamentoDAO {
         return html.toString();
     }
 
-    // Inserir novo registro e recalcular saldos
     public static void inserir(String data, String banco, String tipo, String desc, double valor, String obs) {
         String sql = "INSERT INTO lancamentos (data_movimentacao, banco, tipo, descricao, valor, saldo, observacao) VALUES (?, ?, ?, ?, ?, 0.0, ?)";
         try (Connection conn = Conexao.conectar();
@@ -104,7 +101,6 @@ public class LancamentoDAO {
             stmt.setString(6, obs);
             stmt.executeUpdate();
 
-            // Recalcula o saldo cronológico de todas as linhas
             recalcularSaldos();
             System.out.println("Lançamento inserido com sucesso!");
         } catch (SQLException e) {
@@ -112,7 +108,6 @@ public class LancamentoDAO {
         }
     }
 
-    // Editar registro existente e recalcular saldos
     public static void atualizar(int id, String data, String banco, String tipo, String desc, double valor, String obs) {
         String sql = "UPDATE lancamentos SET data_movimentacao = ?, banco = ?, tipo = ?, descricao = ?, valor = ?, observacao = ? WHERE id = ?";
         try (Connection conn = Conexao.conectar();
@@ -134,7 +129,6 @@ public class LancamentoDAO {
         }
     }
 
-    // Excluir registro e recalcular saldos
     public static void excluir(int id) {
         String sql = "DELETE FROM lancamentos WHERE id = ?";
         try (Connection conn = Conexao.conectar();
@@ -150,7 +144,6 @@ public class LancamentoDAO {
         }
     }
 
-    // Recalcula o saldo acumulado de toda a tabela em ordem cronológica
     private static void recalcularSaldos() {
         String sqlBusca = "SELECT id, tipo, valor FROM lancamentos ORDER BY data_movimentacao ASC, id ASC";
         String sqlAtualiza = "UPDATE lancamentos SET saldo = ? WHERE id = ?";
@@ -166,7 +159,8 @@ public class LancamentoDAO {
                 String tipo = rs.getString("tipo");
                 double valor = rs.getDouble("valor");
 
-                if (tipo != null && tipo.equalsIgnoreCase("Entrada")) {
+                // Assegura robustez na verificação do tipo
+                if (tipo != null && (tipo.equalsIgnoreCase("Entrada") || tipo.equalsIgnoreCase("Receita"))) {
                     saldoAcumulado += valor;
                 } else {
                     saldoAcumulado -= valor;
