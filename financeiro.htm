@@ -38,28 +38,38 @@
             const colunas = linha.querySelectorAll("td");
             if (colunas.length < 6) return;
 
-            const dataTexto = colunas[0].textContent.trim();
+            const dataTexto = colunas[0].textContent.trim(); // Esperado DD/MM/AAAA ou AAAA-MM-DD
             const bancoTexto = colunas[1].textContent.trim().toLowerCase();
             const tipoTexto = colunas[2].textContent.trim().toLowerCase();
 
-            // Extração de ano e mês da data (formato AAAA-MM-DD)
-            const partesData = dataTexto.split("-");
-            const anoData = partesData[0] || "";
-            const mesData = partesData[1] || "";
+            // Extração segura de ano e mês considerando o formato brasileiro (DD/MM/AAAA)
+            let anoData = "";
+            let mesData = "";
+            if (dataTexto.includes("/")) {
+                const partesData = dataTexto.split("/");
+                if (partesData.length === 3) {
+                    mesData = partesData[1];
+                    anoData = partesData[2];
+                }
+            } else if (dataTexto.includes("-")) {
+                const partesIso = dataTexto.split("-");
+                anoData = partesIso[0] || "";
+                mesData = partesIso[1] || "";
+            }
 
             // Limpeza e conversão do valor monetário
             const valorTexto = colunas[4].textContent.replace("R$", "").replace(/\./g, "").replace(",", ".").trim();
             const valor = parseFloat(valorTexto) || 0;
 
-            const atendeBanco = !bancoFiltro || bancoTexto.includes(bancoFiltro);
-            const atendeTipo = !tipoFiltro || tipoTexto.includes(tipoFiltro);
-            const atendeAno = !anoFiltro || anoData === anoFiltro;
-            const atendeMes = !mesFiltro || mesData === mesFiltro;
+            const atendeBanco = !bancoFiltro || bancoFiltro === "todos" || bancoTexto.includes(bancoFiltro);
+            const atendeTipo = !tipoFiltro || tipoFiltro === "todos" || tipoTexto.includes(tipoFiltro);
+            const atendeAno = !anoFiltro || anoFiltro === "todos" || anoData === anoFiltro;
+            const atendeMes = !mesFiltro || mesFiltro === "todos" || mesData === mesFiltro;
 
             if (atendeBanco && atendeTipo && atendeAno && atendeMes) {
                 linha.style.display = "";
                 registrosVisiveis++;
-                if (tipoTexto.includes("entrada")) {
+                if (tipoTexto.includes("entrada") || tipoTexto.includes("receita")) {
                     totalEntrada += valor;
                 } else if (tipoTexto.includes("saída") || tipoTexto.includes("saida")) {
                     totalSaida += valor;
@@ -75,9 +85,14 @@
         
         const saldoAtual = totalEntrada - totalSaida;
         const elSaldo = document.getElementById("displaySaldo");
-        elSaldo.textContent = `R$ ${saldoAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        if (elSaldo) {
+            elSaldo.textContent = `R$ ${saldoAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        }
 
-        document.getElementById("qtdRegistros").textContent = registrosVisiveis;
+        const elQtd = document.getElementById("qtdRegistros");
+        if (elQtd) {
+            elQtd.textContent = registrosVisiveis;
+        }
     }
 
     // Chamar o carregamento dos filtros e aplicar ao iniciar a página
