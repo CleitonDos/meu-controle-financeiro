@@ -81,7 +81,8 @@ public class LancamentoDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println("Erro ao carregar do banco: " + e.getMessage());
+            System.out.println(">>> [LISTAR] Erro ao carregar do banco: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return html.toString();
@@ -89,8 +90,18 @@ public class LancamentoDAO {
 
     public static void inserir(String data, String banco, String tipo, String desc, double valor, String obs) {
         String sql = "INSERT INTO lancamentos (data_movimentacao, banco, tipo, descricao, valor, saldo, observacao) VALUES (?, ?, ?, ?, ?, 0.0, ?)";
+        System.out.println(">>> [INSERIR] ============ INICIO ============");
+        System.out.println(">>> [INSERIR] Data: " + data);
+        System.out.println(">>> [INSERIR] Banco: " + banco);
+        System.out.println(">>> [INSERIR] Tipo: " + tipo);
+        System.out.println(">>> [INSERIR] Descricao: " + desc);
+        System.out.println(">>> [INSERIR] Valor: " + valor);
+        System.out.println(">>> [INSERIR] Obs: " + obs);
+
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            System.out.println(">>> [INSERIR] Conexao com banco estabelecida");
 
             stmt.setString(1, data);
             stmt.setString(2, banco);
@@ -98,16 +109,27 @@ public class LancamentoDAO {
             stmt.setString(4, desc);
             stmt.setDouble(5, valor);
             stmt.setString(6, obs);
-            stmt.executeUpdate();
+
+            int linhas = stmt.executeUpdate();
+            System.out.println(">>> [INSERIR] SUCESSO! Linhas afetadas: " + linhas);
 
             recalcularSaldos();
+            System.out.println(">>> [INSERIR] Saldos recalculados");
+            System.out.println(">>> [INSERIR] ============ FIM ============");
+
         } catch (SQLException e) {
-            System.out.println("Erro ao inserir: " + e.getMessage());
+            System.out.println(">>> [INSERIR] !!!!!!!!!!!! ERRO !!!!!!!!!!!!");
+            System.out.println(">>> [INSERIR] Mensagem: " + e.getMessage());
+            System.out.println(">>> [INSERIR] SQLState: " + e.getSQLState());
+            System.out.println(">>> [INSERIR] ErrorCode: " + e.getErrorCode());
+            e.printStackTrace();
+            System.out.println(">>> [INSERIR] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }
     }
 
     public static void atualizar(int id, String data, String banco, String tipo, String desc, double valor, String obs) {
         String sql = "UPDATE lancamentos SET data_movimentacao = ?, banco = ?, tipo = ?, descricao = ?, valor = ?, observacao = ? WHERE id = ?";
+        System.out.println(">>> [ATUALIZAR] Iniciando update do ID: " + id);
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -118,25 +140,32 @@ public class LancamentoDAO {
             stmt.setDouble(5, valor);
             stmt.setString(6, obs);
             stmt.setInt(7, id);
-            stmt.executeUpdate();
+            int linhas = stmt.executeUpdate();
+            System.out.println(">>> [ATUALIZAR] SUCESSO! Linhas afetadas: " + linhas);
 
             recalcularSaldos();
         } catch (SQLException e) {
-            System.out.println("Erro ao atualizar: " + e.getMessage());
+            System.out.println(">>> [ATUALIZAR] ERRO!!!");
+            System.out.println(">>> Mensagem: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     public static void excluir(int id) {
         String sql = "DELETE FROM lancamentos WHERE id = ?";
+        System.out.println(">>> [EXCLUIR] Iniciando delete do ID: " + id);
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            stmt.executeUpdate();
+            int linhas = stmt.executeUpdate();
+            System.out.println(">>> [EXCLUIR] SUCESSO! Linhas afetadas: " + linhas);
 
             recalcularSaldos();
         } catch (SQLException e) {
-            System.out.println("Erro ao excluir: " + e.getMessage());
+            System.out.println(">>> [EXCLUIR] ERRO!!!");
+            System.out.println(">>> Mensagem: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -166,7 +195,8 @@ public class LancamentoDAO {
                 stmtAtualiza.executeUpdate();
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao recalcular saldos: " + e.getMessage());
+            System.out.println(">>> [RECALCULAR] Erro ao recalcular saldos: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -189,7 +219,8 @@ public class LancamentoDAO {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao calcular total de entradas: " + e.getMessage());
+            System.out.println(">>> [TOTAL ENTRADA] Erro: " + e.getMessage());
+            e.printStackTrace();
         }
         return total;
     }
@@ -213,7 +244,8 @@ public class LancamentoDAO {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao calcular total de saídas: " + e.getMessage());
+            System.out.println(">>> [TOTAL SAIDA] Erro: " + e.getMessage());
+            e.printStackTrace();
         }
         return total;
     }
