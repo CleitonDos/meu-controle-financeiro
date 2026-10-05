@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 
 public class LancamentoDAO {
 
-    // Gera as linhas da tabela com os botões de Editar e Excluir
     public static String gerarLinhasTabelaHTML() {
         StringBuilder html = new StringBuilder();
         String sql = "SELECT * FROM lancamentos ORDER BY data_movimentacao ASC, id ASC";
@@ -36,7 +35,7 @@ public class LancamentoDAO {
                     dataExibicao = dataConvertida.format(formatoBr);
                 } catch (Exception e) {}
 
-                boolean isEntrada = tipo != null && tipo.equalsIgnoreCase("Entrada");
+                boolean isEntrada = tipo != null && (tipo.equalsIgnoreCase("Entrada") || tipo.equalsIgnoreCase("Receita"));
                 String classeLinha = isEntrada ? "linha-entrada" : "linha-saida";
                 String badgeTipo = isEntrada ? "badge-tipo entrada" : "badge-tipo saida";
                 String iconeSeta = isEntrada ? "fa-arrow-down" : "fa-arrow-up";
@@ -102,7 +101,6 @@ public class LancamentoDAO {
             stmt.executeUpdate();
 
             recalcularSaldos();
-            System.out.println("Lançamento inserido com sucesso!");
         } catch (SQLException e) {
             System.out.println("Erro ao inserir: " + e.getMessage());
         }
@@ -123,7 +121,6 @@ public class LancamentoDAO {
             stmt.executeUpdate();
 
             recalcularSaldos();
-            System.out.println("Lançamento atualizado com sucesso!");
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar: " + e.getMessage());
         }
@@ -138,7 +135,6 @@ public class LancamentoDAO {
             stmt.executeUpdate();
 
             recalcularSaldos();
-            System.out.println("Lançamento excluído com sucesso!");
         } catch (SQLException e) {
             System.out.println("Erro ao excluir: " + e.getMessage());
         }
@@ -174,13 +170,8 @@ public class LancamentoDAO {
         }
     }
 
-    // =========================================================================
-    // NOVOS MÉTODOS: Totais Gerais para os Cartões (Respeitam apenas o Banco)
-    // =========================================================================
-
     public static double calcularTotalEntradaGeral(String bancoFiltro) {
         StringBuilder sql = new StringBuilder("SELECT SUM(valor) FROM lancamentos WHERE (tipo = 'Entrada' OR tipo = 'Receita')");
-        
         boolean filtrarBanco = bancoFiltro != null && !bancoFiltro.equalsIgnoreCase("Todos") && !bancoFiltro.trim().isEmpty();
         if (filtrarBanco) {
             sql.append(" AND banco = ?");
@@ -189,25 +180,22 @@ public class LancamentoDAO {
         double total = 0.0;
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-            
             if (filtrarBanco) {
                 stmt.setString(1, bancoFiltro);
             }
-            
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     total = rs.getDouble(1);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao calcular total de entradas gerais: " + e.getMessage());
+            System.out.println("Erro ao calcular total de entradas: " + e.getMessage());
         }
         return total;
     }
 
     public static double calcularTotalSaidaGeral(String bancoFiltro) {
         StringBuilder sql = new StringBuilder("SELECT SUM(valor) FROM lancamentos WHERE (tipo = 'Saída' OR tipo = 'Saida')");
-        
         boolean filtrarBanco = bancoFiltro != null && !bancoFiltro.equalsIgnoreCase("Todos") && !bancoFiltro.trim().isEmpty();
         if (filtrarBanco) {
             sql.append(" AND banco = ?");
@@ -216,18 +204,16 @@ public class LancamentoDAO {
         double total = 0.0;
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-            
             if (filtrarBanco) {
                 stmt.setString(1, bancoFiltro);
             }
-            
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     total = rs.getDouble(1);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao calcular total de saídas gerais: " + e.getMessage());
+            System.out.println("Erro ao calcular total de saídas: " + e.getMessage());
         }
         return total;
     }
