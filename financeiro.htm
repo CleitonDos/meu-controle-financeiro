@@ -80,14 +80,18 @@
             box-shadow: 0 8px 20px rgba(79, 172, 254, 0.25);
         }
 
+        /* ============================================
+           CARDS DE TOTAIS - AJUSTADOS
+           ============================================ */
         .card-total {
             background: #1c1c34;
             border: 1px solid #2a2a4a;
             border-radius: 14px;
-            padding: 14px 16px;
+            padding: 14px 10px;
             text-align: center;
             transition: 0.3s;
             height: 100%;
+            overflow: hidden;
         }
         .card-total:hover {
             border-color: #4facfe;
@@ -96,21 +100,24 @@
         }
         .card-total .rotulo {
             color: #8a8ab0;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
         }
         .card-total .valor {
-            font-size: 22px;
+            font-size: 17px;
             font-weight: 700;
             margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .card-total .valor.entrada { color: #4ade80; }
         .card-total .valor.saida { color: #dc3545; }
         .card-total .valor.saldo { color: #4facfe; }
         .card-total .icone {
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 4px;
             display: block;
         }
@@ -118,11 +125,15 @@
         .card-total .icone.saida { color: #dc3545; }
         .card-total .icone.saldo { color: #4facfe; }
 
+        /* ============================================
+           FILTROS - COMPACTOS
+           ============================================ */
         .filtros-area {
             background: #1c1c34;
             border-radius: 14px;
             padding: 16px 20px;
             border: 1px solid #2a2a4a;
+            height: 100%;
         }
         .filtros-area .form-label {
             color: #8a8ab0;
@@ -137,10 +148,11 @@
             background: #0b0b15;
             border: 1px solid #2d2d50;
             color: #e0e0f0;
-            font-size: 14px;
+            font-size: 13px;
             border-radius: 8px;
-            padding: 8px 12px;
+            padding: 7px 10px;
             cursor: pointer;
+            width: 100%;
         }
         .filtros-area .form-select:focus,
         .filtros-area .form-control:focus {
@@ -360,13 +372,13 @@
         @media (max-width: 768px) {
             .container-fluid { padding: 16px !important; }
             .titulo-controle { font-size: 20px; }
-            .card-total .valor { font-size: 18px; }
+            .card-total .valor { font-size: 15px; }
             .table { font-size: 13px; }
             .table thead th, .table tbody td { padding: 8px 10px; }
         }
         @media (max-width: 576px) {
             .titulo-controle { font-size: 17px; padding-left: 10px; }
-            .card-total .valor { font-size: 16px; }
+            .card-total .valor { font-size: 13px; }
             .container-fluid { padding: 12px !important; border-radius: 14px !important; }
             .table { font-size: 12px; }
             .table thead th, .table tbody td { padding: 6px 8px; }
@@ -437,8 +449,8 @@
         <!-- TOTAIS + FILTROS -->
         <div class="row g-3 align-items-stretch mb-4">
 
-            <!-- TOTAIS -->
-            <div class="col-12 col-lg-4">
+            <!-- TOTAIS (mais largos) -->
+            <div class="col-12 col-lg-5">
                 <div class="row g-2">
                     <div class="col-4">
                         <div class="card-total">
@@ -464,11 +476,11 @@
                 </div>
             </div>
 
-            <!-- FILTROS -->
-            <div class="col-12 col-lg-8">
+            <!-- FILTROS (mais compactos) -->
+            <div class="col-12 col-lg-7">
                 <div class="filtros-area">
                     <div class="row g-2">
-                        <div class="col-6 col-md-3">
+                        <div class="col-3">
                             <label class="form-label"><i class="fas fa-university me-1"></i> Banco</label>
                             <select class="form-select form-select-sm" id="filtroBanco" onchange="aplicarFiltros()">
                                 <option value="Todos">Todos</option>
@@ -482,7 +494,7 @@
                             </select>
                         </div>
 
-                        <div class="col-6 col-md-3">
+                        <div class="col-3">
                             <label class="form-label"><i class="fas fa-tag me-1"></i> Tipo</label>
                             <select class="form-select form-select-sm" id="filtroTipo" onchange="aplicarFiltros()">
                                 <option value="Todos">Todos</option>
@@ -491,7 +503,7 @@
                             </select>
                         </div>
 
-                        <div class="col-6 col-md-3">
+                        <div class="col-3">
                             <label class="form-label"><i class="fas fa-calendar me-1"></i> Ano</label>
                             <select class="form-select form-select-sm" id="filtroAno" onchange="aplicarFiltros()">
                                 <option value="Todos">Todos</option>
@@ -502,7 +514,7 @@
                             </select>
                         </div>
 
-                        <div class="col-6 col-md-3">
+                        <div class="col-3">
                             <label class="form-label"><i class="fas fa-calendar-alt me-1"></i> Mês</label>
                             <select class="form-select form-select-sm" id="filtroMes" onchange="aplicarFiltros()">
                                 <option value="Todos">Todos</option>
