@@ -1,106 +1,130 @@
-<script>
-    // ==========================================
-    // MEMORIZAÇÃO E APLICAÇÃO DOS FILTROS
-    // ==========================================
-    function carregarFiltrosSalvos() {
-        const banco = localStorage.getItem("filtro_banco");
-        const tipo = localStorage.getItem("filtro_tipo");
-        const ano = localStorage.getItem("filtro_ano");
-        const mes = localStorage.getItem("filtro_mes");
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro Web</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .linha-entrada { background-color: rgba(25, 135, 84, 0.05); }
+        .linha-saida { background-color: rgba(220, 53, 69, 0.05); }
+        .badge-tipo.entrada { background-color: #d1e7dd; color: #0f5132; padding: 5px 10px; border-radius: 4px; font-weight: 500; }
+        .badge-tipo.saida { background-color: #f8d7da; color: #842029; padding: 5px 10px; border-radius: 4px; font-weight: 500; }
+        .btn-acao { border: none; background: none; padding: 4px 8px; border-radius: 4px; }
+        .btn-acao-edit { color: #ffc107; }
+        .btn-acao-del { color: #dc3545; }
+        .obs-icon { cursor: pointer; color: #6c757d; }
+    </style>
+</head>
+<body>
 
-        if (banco !== null) document.getElementById("filtroBanco").value = banco;
-        if (tipo !== null) document.getElementById("filtroTipo").value = tipo;
-        if (ano !== null) document.getElementById("filtroAno").value = ano;
-        if (mes !== null) document.getElementById("filtroMes").value = mes;
-    }
+    <div class="container my-4">
+        <!-- Cabeçalho -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-wallet text-primary me-2"></i>Controle Financeiro Web</h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalNovo">
+                <i class="fas fa-plus me-1"></i> Novo Lançamento
+            </button>
+        </div>
 
-    function salvarFiltrosNaMemoria() {
-        localStorage.setItem("filtro_banco", document.getElementById("filtroBanco").value);
-        localStorage.setItem("filtro_tipo", document.getElementById("filtroTipo").value);
-        localStorage.setItem("filtro_ano", document.getElementById("filtroAno").value);
-        localStorage.setItem("filtro_mes", document.getElementById("filtroMes").value);
-    }
+        <!-- Cards de Resumo -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-start border-success border-4">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Entradas</h6>
+                        <h4 id="displayEntrada" class="text-success mb-0"><!--TOTAL_ENTRADA--></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-start border-danger border-4">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Saídas</h6>
+                        <h4 id="displaySaida" class="text-danger mb-0"><!--TOTAL_SAIDA--></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-start border-primary border-4">
+                    <div class="card-body">
+                        <h6 class="text-muted">Saldo Atual</h6>
+                        <h4 id="displaySaldo" class="text-primary mb-0"><!--TOTAL_SALDO--></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    function aplicarFiltros() {
-        salvarFiltrosNaMemoria();
+        <!-- Filtros -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Banco</label>
+                        <select id="filtroBanco" class="form-select" onchange="aplicarFiltros()">
+                            <option value="">Todos</option>
+                            <option value="Nubank">Nubank</option>
+                            <option value="Itaú">Itaú</option>
+                            <option value="Banco do Brasil">Banco do Brasil</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo</label>
+                        <select id="filtroTipo" class="form-select" onchange="aplicarFiltros()">
+                            <option value="">Todos</option>
+                            <option value="Entrada">Entrada</option>
+                            <option value="Saída">Saída</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Ano</label>
+                        <select id="filtroAno" class="form-select" onchange="aplicarFiltros()">
+                            <option value="">Todos</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Mês</label>
+                        <select id="filtroMes" class="form-select" onchange="aplicarFiltros()">
+                            <option value="">Todos</option>
+                            <option value="01">Janeiro</option>
+                            <option value="02">Fevereiro</option>
+                            <option value="03">Março</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Maio</option>
+                            <option value="06">Junho</option>
+                            <option value="07">Julho</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <span class="text-muted small">Registros: <strong id="qtdRegistros">0</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        const bancoFiltro = document.getElementById("filtroBanco").value.toLowerCase();
-        const tipoFiltro = document.getElementById("filtroTipo").value.toLowerCase();
-        const anoFiltro = document.getElementById("filtroAno").value;
-        const mesFiltro = document.getElementById("filtroMes").value;
-
-        const linhas = document.querySelectorAll("#corpoTabela tr");
-        let totalEntrada = 0.0;
-        let totalSaida = 0.0;
-        let registrosVisiveis = 0;
-
-        linhas.forEach(linha => {
-            const colunas = linha.querySelectorAll("td");
-            if (colunas.length < 6) return;
-
-            const dataTexto = colunas[0].textContent.trim(); // Esperado DD/MM/AAAA ou AAAA-MM-DD
-            const bancoTexto = colunas[1].textContent.trim().toLowerCase();
-            const tipoTexto = colunas[2].textContent.trim().toLowerCase();
-
-            // Extração segura de ano e mês considerando o formato brasileiro (DD/MM/AAAA)
-            let anoData = "";
-            let mesData = "";
-            if (dataTexto.includes("/")) {
-                const partesData = dataTexto.split("/");
-                if (partesData.length === 3) {
-                    mesData = partesData[1];
-                    anoData = partesData[2];
-                }
-            } else if (dataTexto.includes("-")) {
-                const partesIso = dataTexto.split("-");
-                anoData = partesIso[0] || "";
-                mesData = partesIso[1] || "";
-            }
-
-            // Limpeza e conversão do valor monetário
-            const valorTexto = colunas[4].textContent.replace("R$", "").replace(/\./g, "").replace(",", ".").trim();
-            const valor = parseFloat(valorTexto) || 0;
-
-            const atendeBanco = !bancoFiltro || bancoFiltro === "todos" || bancoTexto.includes(bancoFiltro);
-            const atendeTipo = !tipoFiltro || tipoFiltro === "todos" || tipoTexto.includes(tipoFiltro);
-            const atendeAno = !anoFiltro || anoFiltro === "todos" || anoData === anoFiltro;
-            const atendeMes = !mesFiltro || mesFiltro === "todos" || mesData === mesFiltro;
-
-            if (atendeBanco && atendeTipo && atendeAno && atendeMes) {
-                linha.style.display = "";
-                registrosVisiveis++;
-                if (tipoTexto.includes("entrada") || tipoTexto.includes("receita")) {
-                    totalEntrada += valor;
-                } else if (tipoTexto.includes("saída") || tipoTexto.includes("saida")) {
-                    totalSaida += valor;
-                }
-            } else {
-                linha.style.display = "none";
-            }
-        });
-
-        // Atualização dos cartões de totais
-        document.getElementById("displayEntrada").textContent = `R$ ${totalEntrada.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-        document.getElementById("displaySaida").textContent = `R$ ${totalSaida.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-        
-        const saldoAtual = totalEntrada - totalSaida;
-        const elSaldo = document.getElementById("displaySaldo");
-        if (elSaldo) {
-            elSaldo.textContent = `R$ ${saldoAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-        }
-
-        const elQtd = document.getElementById("qtdRegistros");
-        if (elQtd) {
-            elQtd.textContent = registrosVisiveis;
-        }
-    }
-
-    // Chamar o carregamento dos filtros e aplicar ao iniciar a página
-    window.addEventListener("DOMContentLoaded", () => {
-        carregarFiltrosSalvos();
-        aplicarFiltros();
-        if (typeof verificarAutenticacao === 'function') {
-            verificarAutenticacao();
-        }
-    });
-</script>
+        <!-- Tabela de Lançamentos -->
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Data</th>
+                                <th>Banco</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th class="text-end">Valor</th>
+                                <th class="text-end">Saldo</th>
+                                <th>Obs.</th>
+                                <th class="text-center">Ações</th>
