@@ -19,12 +19,10 @@ import java.util.Map;
 public class ControleFinanceiroWeb {
 
     public static void main(String[] args) throws IOException {
-        
         Conexao.inicializarBanco();
 
         HttpServer servidor = HttpServer.create(new InetSocketAddress("0.0.0.0", 8080), 0);
 
-        // ROTA 1: Página inicial
         servidor.createContext("/", new HttpHandler() {
             @Override
             public void handle(HttpExchange troca) throws IOException {
@@ -33,16 +31,13 @@ public class ControleFinanceiroWeb {
                 if (arquivoHtml.exists()) {
                     String conteudo = new String(Files.readAllBytes(arquivoHtml.toPath()), "UTF-8");
                     
-                    // 1. Gera as linhas da tabela
                     String linhasBanco = LancamentoDAO.gerarLinhasTabelaHTML();
                     conteudo = conteudo.replace("<!--DADOS_TABELA-->", linhasBanco);
 
-                    // 2. Calcula os totais gerais iniciais (sem restrição de banco ou "Todos")
                     double totalEntradaGeral = LancamentoDAO.calcularTotalEntradaGeral("Todos");
                     double totalSaidaGeral = LancamentoDAO.calcularTotalSaidaGeral("Todos");
                     double saldoAtualGeral = totalEntradaGeral - totalSaidaGeral;
 
-                    // 3. Substitui os valores nos placeholders do HTML
                     conteudo = conteudo.replace("<!--TOTAL_ENTRADA-->", String.format("R$ %.2f", totalEntradaGeral));
                     conteudo = conteudo.replace("<!--TOTAL_SAIDA-->", String.format("R$ %.2f", totalSaidaGeral));
                     conteudo = conteudo.replace("<!--TOTAL_SALDO-->", String.format("R$ %.2f", saldoAtualGeral));
@@ -64,7 +59,6 @@ public class ControleFinanceiroWeb {
             }
         });
 
-        // ROTA 2: Salvar Novo Lançamento
         servidor.createContext("/salvar", new HttpHandler() {
             @Override
             public void handle(HttpExchange troca) throws IOException {
@@ -79,13 +73,11 @@ public class ControleFinanceiroWeb {
                     String obs = campos.getOrDefault("observacao", "");
 
                     LancamentoDAO.inserir(data, banco, tipo, desc, valor, obs);
-
                     redirecionarParaInicio(troca);
                 }
             }
         });
 
-        // ROTA 3: Editar Lançamento Existente
         servidor.createContext("/editar", new HttpHandler() {
             @Override
             public void handle(HttpExchange troca) throws IOException {
@@ -101,18 +93,16 @@ public class ControleFinanceiroWeb {
                     String obs = campos.getOrDefault("observacao", "");
 
                     LancamentoDAO.atualizar(id, data, banco, tipo, desc, valor, obs);
-
                     redirecionarParaInicio(troca);
                 }
             }
         });
 
-        // ROTA 4: Excluir Lançamento
         servidor.createContext("/excluir", new HttpHandler() {
             @Override
             public void handle(HttpExchange troca) throws IOException {
                 URI uri = troca.getRequestURI();
-                String query = uri.getQuery(); // pega ?id=X
+                String query = uri.getQuery();
                 if (query != null && query.startsWith("id=")) {
                     int id = Integer.parseInt(query.replace("id=", ""));
                     LancamentoDAO.excluir(id);
