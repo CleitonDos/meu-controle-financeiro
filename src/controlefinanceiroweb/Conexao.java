@@ -44,5 +44,4 @@ public class Conexao {
             System.err.println("Erro ao verificar tabela no TiDB: " + e.getMessage());
         }
     }
-    
 }
