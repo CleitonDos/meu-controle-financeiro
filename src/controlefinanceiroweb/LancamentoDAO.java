@@ -4,15 +4,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class LancamentoDAO {
+
+    private static final NumberFormat FORMATO_BR = NumberFormat.getNumberInstance(new Locale("pt", "BR"));
 
     public static String gerarLinhasTabelaHTML() {
         StringBuilder html = new StringBuilder();
         String sql = "SELECT * FROM lancamentos ORDER BY data_movimentacao ASC, id ASC";
         DateTimeFormatter formatoBr = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        FORMATO_BR.setMinimumFractionDigits(2);
+        FORMATO_BR.setMaximumFractionDigits(2);
 
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -61,8 +68,8 @@ public class LancamentoDAO {
                 html.append("  <td><i class='fas fa-building-columns me-1'></i> ").append(banco).append("</td>\n");
                 html.append("  <td><span class='").append(badgeTipo).append("' title=''><i class='fas ").append(iconeSeta).append(" me-1'></i> ").append(tipo).append("</span></td>\n");
                 html.append("  <td>").append(desc).append("</td>\n");
-                html.append("  <td class='text-end'>R$ ").append(String.format("%.2f", valor)).append("</td>\n");
-                html.append("  <td class='text-end'>R$ ").append(String.format("%.2f", saldo)).append("</td>\n");
+                html.append("  <td class='text-end'>R$ ").append(FORMATO_BR.format(valor)).append("</td>\n");
+                html.append("  <td class='text-end'>R$ ").append(FORMATO_BR.format(saldo)).append("</td>\n");
                 html.append("  <td>").append(iconeObs).append("</td>\n");
 
                 html.append("  <td class='text-center'>\n");
@@ -88,6 +95,12 @@ public class LancamentoDAO {
         return html.toString();
     }
 
+    public static String formatarMoeda(double valor) {
+        FORMATO_BR.setMinimumFractionDigits(2);
+        FORMATO_BR.setMaximumFractionDigits(2);
+        return FORMATO_BR.format(valor);
+    }
+
     public static void inserir(String data, String banco, String tipo, String desc, double valor, String obs) {
         String sql = "INSERT INTO lancamentos (data_movimentacao, banco, tipo, descricao, valor, saldo, observacao) VALUES (?, ?, ?, ?, ?, 0.0, ?)";
         System.out.println(">>> [INSERIR] ============ INICIO ============");
@@ -96,12 +109,9 @@ public class LancamentoDAO {
         System.out.println(">>> [INSERIR] Tipo: " + tipo);
         System.out.println(">>> [INSERIR] Descricao: " + desc);
         System.out.println(">>> [INSERIR] Valor: " + valor);
-        System.out.println(">>> [INSERIR] Obs: " + obs);
 
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            System.out.println(">>> [INSERIR] Conexao com banco estabelecida");
 
             stmt.setString(1, data);
             stmt.setString(2, banco);
@@ -114,22 +124,16 @@ public class LancamentoDAO {
             System.out.println(">>> [INSERIR] SUCESSO! Linhas afetadas: " + linhas);
 
             recalcularSaldos();
-            System.out.println(">>> [INSERIR] Saldos recalculados");
             System.out.println(">>> [INSERIR] ============ FIM ============");
 
         } catch (SQLException e) {
-            System.out.println(">>> [INSERIR] !!!!!!!!!!!! ERRO !!!!!!!!!!!!");
-            System.out.println(">>> [INSERIR] Mensagem: " + e.getMessage());
-            System.out.println(">>> [INSERIR] SQLState: " + e.getSQLState());
-            System.out.println(">>> [INSERIR] ErrorCode: " + e.getErrorCode());
+            System.out.println(">>> [INSERIR] ERRO: " + e.getMessage());
             e.printStackTrace();
-            System.out.println(">>> [INSERIR] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }
     }
 
     public static void atualizar(int id, String data, String banco, String tipo, String desc, double valor, String obs) {
         String sql = "UPDATE lancamentos SET data_movimentacao = ?, banco = ?, tipo = ?, descricao = ?, valor = ?, observacao = ? WHERE id = ?";
-        System.out.println(">>> [ATUALIZAR] Iniciando update do ID: " + id);
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -140,31 +144,26 @@ public class LancamentoDAO {
             stmt.setDouble(5, valor);
             stmt.setString(6, obs);
             stmt.setInt(7, id);
-            int linhas = stmt.executeUpdate();
-            System.out.println(">>> [ATUALIZAR] SUCESSO! Linhas afetadas: " + linhas);
+            stmt.executeUpdate();
 
             recalcularSaldos();
         } catch (SQLException e) {
-            System.out.println(">>> [ATUALIZAR] ERRO!!!");
-            System.out.println(">>> Mensagem: " + e.getMessage());
+            System.out.println(">>> [ATUALIZAR] ERRO: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     public static void excluir(int id) {
         String sql = "DELETE FROM lancamentos WHERE id = ?";
-        System.out.println(">>> [EXCLUIR] Iniciando delete do ID: " + id);
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            int linhas = stmt.executeUpdate();
-            System.out.println(">>> [EXCLUIR] SUCESSO! Linhas afetadas: " + linhas);
+            stmt.executeUpdate();
 
             recalcularSaldos();
         } catch (SQLException e) {
-            System.out.println(">>> [EXCLUIR] ERRO!!!");
-            System.out.println(">>> Mensagem: " + e.getMessage());
+            System.out.println(">>> [EXCLUIR] ERRO: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -195,7 +194,7 @@ public class LancamentoDAO {
                 stmtAtualiza.executeUpdate();
             }
         } catch (SQLException e) {
-            System.out.println(">>> [RECALCULAR] Erro ao recalcular saldos: " + e.getMessage());
+            System.out.println(">>> [RECALCULAR] Erro: " + e.getMessage());
             e.printStackTrace();
         }
     }
