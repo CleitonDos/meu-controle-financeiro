@@ -23,7 +23,7 @@ public class ControleFinanceiroWeb {
 
         HttpServer servidor = HttpServer.create(new InetSocketAddress("0.0.0.0", 8080), 0);
 
-        servidor.createContext("/", new HttpHandler() {
+               servidor.createContext("/", new HttpHandler() {
             @Override
             public void handle(HttpExchange troca) throws IOException {
                 File arquivoHtml = new File("financeiro.htm");
@@ -38,9 +38,9 @@ public class ControleFinanceiroWeb {
                     double totalSaidaGeral = LancamentoDAO.calcularTotalSaidaGeral("Todos");
                     double saldoAtualGeral = totalEntradaGeral - totalSaidaGeral;
 
-                    conteudo = conteudo.replace("<!--TOTAL_ENTRADA-->", String.format("R$ %.2f", totalEntradaGeral));
-                    conteudo = conteudo.replace("<!--TOTAL_SAIDA-->", String.format("R$ %.2f", totalSaidaGeral));
-                    conteudo = conteudo.replace("<!--TOTAL_SALDO-->", String.format("R$ %.2f", saldoAtualGeral));
+                    conteudo = conteudo.replace("<!--TOTAL_ENTRADA-->", "R$ " + LancamentoDAO.formatarMoeda(totalEntradaGeral));
+                    conteudo = conteudo.replace("<!--TOTAL_SAIDA-->", "R$ " + LancamentoDAO.formatarMoeda(totalSaidaGeral));
+                    conteudo = conteudo.replace("<!--TOTAL_SALDO-->", "R$ " + LancamentoDAO.formatarMoeda(saldoAtualGeral));
 
                     byte[] resposta = conteudo.getBytes("UTF-8");
                     troca.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
@@ -58,7 +58,6 @@ public class ControleFinanceiroWeb {
                 }
             }
         });
-
         servidor.createContext("/salvar", new HttpHandler() {
             @Override
             public void handle(HttpExchange troca) throws IOException {
