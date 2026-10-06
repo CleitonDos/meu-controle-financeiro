@@ -11,8 +11,9 @@
 
         body {
             background: #0b0b12;
-            min-height: 100vh;
+            height: 100vh;
             padding: 20px;
+            overflow: hidden;
             background-image: radial-gradient(circle at 20% 30%, rgba(79, 172, 254, 0.04) 0%, transparent 60%),
                               radial-gradient(circle at 80% 70%, rgba(220, 50, 50, 0.04) 0%, transparent 60%);
         }
@@ -25,6 +26,10 @@
             padding: 28px 30px !important;
             max-width: 1300px;
             margin: 0 auto;
+            height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .topo-titulo {
@@ -34,6 +39,7 @@
             margin-bottom: 22px;
             flex-wrap: wrap;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .titulo-controle {
@@ -81,7 +87,7 @@
         }
 
         /* ============================================
-           CARDS DE TOTAIS - AJUSTADOS
+           CARDS DE TOTAIS
            ============================================ */
         .card-total {
             background: #1c1c34;
@@ -126,7 +132,7 @@
         .card-total .icone.saldo { color: #4facfe; }
 
         /* ============================================
-           FILTROS - COMPACTOS
+           FILTROS
            ============================================ */
         .filtros-area {
             background: #1c1c34;
@@ -175,6 +181,7 @@
             border-radius: 14px;
             padding: 20px;
             margin-bottom: 20px;
+            flex-shrink: 0;
         }
         .form-novo.ativo { display: block; }
         .form-novo h5 {
@@ -212,19 +219,41 @@
         }
         .btn-salvar-form:hover { transform: translateY(-2px); }
 
-        /* TABELA */
+        /* ============================================
+           TABELA COM SCROLL INTERNO + CABEÇALHO FIXO
+           ============================================ */
         .table-responsive {
             border-radius: 14px;
             border: 1px solid #2a2a4a;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             margin-top: 16px;
             background: #10101f;
+            flex: 1;
+            min-height: 0;
         }
+
+        /* Scrollbar estilizada */
+        .table-responsive::-webkit-scrollbar {
+            width: 10px;
+        }
+        .table-responsive::-webkit-scrollbar-track {
+            background: #141425;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #2a2a4a;
+            border-radius: 5px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #3a3a5a;
+        }
+
         .table {
             margin-bottom: 0;
             font-size: 14px;
             background: #10101f;
         }
+
         .table thead th {
             background: #1c1c34;
             color: #4facfe;
@@ -235,7 +264,11 @@
             padding: 14px 16px;
             border-bottom: 2px solid #2f2f52;
             border-color: #2a2a4a;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
+
         .table tbody td {
             padding: 12px 16px;
             vertical-align: middle;
@@ -243,6 +276,7 @@
             color: #d4d4f0;
             background: #10101f;
         }
+
         .table tbody tr {
             background: #10101f;
             transition: 0.2s;
@@ -442,9 +476,9 @@
         </div>
 
         <!-- TOTAIS + FILTROS -->
-        <div class="row g-3 align-items-stretch mb-4">
+        <div class="row g-3 align-items-stretch mb-4" style="flex-shrink: 0;">
 
-            <!-- TOTAIS (mais largos) -->
+            <!-- TOTAIS -->
             <div class="col-12 col-lg-5">
                 <div class="row g-2">
                     <div class="col-4">
@@ -471,13 +505,13 @@
                 </div>
             </div>
 
-            <!-- FILTROS (mais compactos) -->
+            <!-- FILTROS -->
             <div class="col-12 col-lg-7">
                 <div class="filtros-area">
                     <div class="row g-2">
                         <div class="col-3">
                             <label class="form-label"><i class="fas fa-university me-1"></i> Banco</label>
-                           <select class="form-select form-select-sm" id="filtroBanco" onchange="aplicarFiltros()">
+                            <select class="form-select form-select-sm" id="filtroBanco" onchange="aplicarFiltros()">
                                 <option value="Todos">Todos</option>
                                 <option value="Caixa">Caixa</option>
                                 <option value="PicPay">PicPay</option>
@@ -556,7 +590,7 @@
         </div>
 
         <!-- RODAPÉ -->
-        <div class="row mt-3">
+        <div class="row mt-3" style="flex-shrink: 0;">
             <div class="col-12">
                 <div class="rodape-info d-flex justify-content-end align-items-center gap-3 flex-wrap">
                     <span><i class="fas fa-database me-1"></i> <span id="qtdRodape">0</span> registros</span>
@@ -574,7 +608,7 @@
             <form action="/editar" method="POST">
                 <input type="hidden" name="id" id="editId">
                 <input type="date" name="data" id="editData" required>
-               <select name="banco" id="editBanco" required>
+                <select name="banco" id="editBanco" required>
                     <option value="Caixa">Caixa</option>
                     <option value="PicPay">PicPay</option>
                 </select>
