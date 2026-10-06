@@ -661,8 +661,8 @@
             salvarFiltrosNaMemoria();
             const bancoFiltro = document.getElementById("filtroBanco").value.toLowerCase();
             const tipoFiltro = document.getElementById("filtroTipo").value.toLowerCase();
-            const anoFiltro = document.getElementById("filtroAno").value;
-            const mesFiltro = document.getElementById("filtroMes").value;
+            const anoFiltro = document.getElementById("filtroAno").value.toLowerCase();
+            const mesFiltro = document.getElementById("filtroMes").value.toLowerCase();
 
             const linhas = document.querySelectorAll("#corpoTabela tr");
             let totalEntrada = 0.0, totalSaida = 0.0, registrosVisiveis = 0;
