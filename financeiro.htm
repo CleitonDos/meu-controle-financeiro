@@ -676,7 +676,7 @@
             aplicarFiltros();
         }
 
-        function aplicarFiltros() {
+                function aplicarFiltros() {
             salvarFiltrosNaMemoria();
             const bancoFiltro = document.getElementById("filtroBanco").value.toLowerCase();
             const tipoFiltro = document.getElementById("filtroTipo").value.toLowerCase();
@@ -684,8 +684,9 @@
             const mesFiltro = document.getElementById("filtroMes").value.toLowerCase();
 
             const linhas = document.querySelectorAll("#corpoTabela tr");
-            let totalEntrada = 0.0, totalSaida = 0.0, registrosVisiveis = 0;
+            const linhasVisiveis = [];
 
+            // 1º passe: filtra e esconde as linhas que não atendem
             linhas.forEach(linha => {
                 const colunas = linha.querySelectorAll("td");
                 if (colunas.length < 6) return;
@@ -702,9 +703,6 @@
                     anoData = p[0] || ""; mesData = p[1] || "";
                 }
 
-                const valorTexto = colunas[4].textContent.replace("R$", "").replace(/\./g, "").replace(",", ".").trim();
-                const valor = parseFloat(valorTexto) || 0;
-
                 const atendeBanco = !bancoFiltro || bancoFiltro === "todos" || bancoTexto.includes(bancoFiltro);
                 const atendeTipo = !tipoFiltro || tipoFiltro === "todos" || tipoTexto.includes(tipoFiltro);
                 const atendeAno = !anoFiltro || anoFiltro === "todos" || anoData === anoFiltro;
@@ -712,22 +710,41 @@
 
                 if (atendeBanco && atendeTipo && atendeAno && atendeMes) {
                     linha.style.display = "";
-                    registrosVisiveis++;
-                    if (tipoTexto.includes("entrada") || tipoTexto.includes("receita")) totalEntrada += valor;
-                    else if (tipoTexto.includes("saída") || tipoTexto.includes("saida")) totalSaida += valor;
+                    linhasVisiveis.push({ colunas: colunas, tipoTexto: tipoTexto });
                 } else {
                     linha.style.display = "none";
                 }
             });
 
+            // 2º passe: recalcula o saldo acumulado APENAS das linhas visíveis
+            let saldoAcumulado = 0.0;
+            let totalEntrada = 0.0, totalSaida = 0.0;
+
+            linhasVisiveis.forEach(item => {
+                const valorTexto = item.colunas[4].textContent.replace("R$", "").replace(/\./g, "").replace(",", ".").trim();
+                const valor = parseFloat(valorTexto) || 0;
+                const isEntrada = item.tipoTexto.includes("entrada") || item.tipoTexto.includes("receita");
+
+                if (isEntrada) {
+                    saldoAcumulado += valor;
+                    totalEntrada += valor;
+                } else {
+                    saldoAcumulado -= valor;
+                    totalSaida += valor;
+                }
+
+                // Atualiza a célula de saldo (coluna 6 = index 5)
+                item.colunas[5].textContent = `R$ ${saldoAcumulado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            });
+
+            // Atualiza os cards com os valores filtrados
             document.getElementById("displayEntrada").textContent = `R$ ${totalEntrada.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
             document.getElementById("displaySaida").textContent = `R$ ${totalSaida.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
             document.getElementById("displaySaldo").textContent = `R$ ${(totalEntrada - totalSaida).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-            document.getElementById("qtdRegistros").textContent = registrosVisiveis;
+            document.getElementById("qtdRegistros").textContent = linhasVisiveis.length;
             const elRodape = document.getElementById("qtdRodape");
-            if (elRodape) elRodape.textContent = registrosVisiveis;
+            if (elRodape) elRodape.textContent = linhasVisiveis.length;
         }
-
         window.addEventListener("DOMContentLoaded", () => {
             carregarFiltrosSalvos();
             aplicarFiltros();
